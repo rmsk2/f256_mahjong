@@ -67,7 +67,7 @@ processByte
 
 overwrite
     sta (BLIT_TARGET)
-
+    rts
 
 overwriteWithTransparency
     beq _transparent

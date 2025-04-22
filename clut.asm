@@ -93,8 +93,7 @@ init
 
     #setGfxColAlternate TC0, $000000
     #setGfxColAlternate TC2, $cdb79e
-    #setGfxColAlternate TC3, $dec6ab
-    #setGfxColAlternate TC4, $ffffff
+    #setGfxColAlternate TC3, $ffffff
 
 
     ; #setGfxColInt 5,  $01, $FF, $E4, $FF

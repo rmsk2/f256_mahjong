@@ -183,44 +183,6 @@ def gen_asm(all_tiles, all_cols, col_offset, tile_offset):
             tile_count += 1
 
 
-def mirror_x(tile_data):
-    res = [None, None, None, None, None, None, None, None]
-    
-    for i in range(4):
-        res[i] = tile_data[7-i]
-        res[7-i] = tile_data[i]
-    
-    return res
-
-
-def transpose(tile_data):    
-    res = []
-
-    for i in range(8):
-        res.append([None, None, None, None, None, None, None, None])
-    
-    for i in range(8):
-        for j in range(8):
-            res[j][i] = tile_data[i][7-j]
-
-    return res
-
-
-def mirror_y(tile_data):
-    res = []
-
-    for i in range(8):
-        res.append([None, None, None, None, None, None, None, None])
-
-    def copy_colum(source, target):
-        for y in range(8):
-            res[y][target] = tile_data[y][source]    
-
-    for i in range(8):
-        copy_colum(7-i, i)
-    
-    return res
-
 
 def process_xpms(file_names):
     # First colour number which can be assigned automatically
@@ -236,16 +198,6 @@ def process_xpms(file_names):
         tile, new_cols = read_xpm(i, all_cols)
         all_tiles[i[:-4]] = tile
         all_cols = new_cols
-    
-    # head_data = all_tiles['head']
-    # del all_tiles['head']
-
-    # # Auto generate tiles for the three orientations of the caterpillar
-    # # head which are not drawn by hand
-    # all_tiles['head_up'] = head_data
-    # all_tiles['head_down'] = mirror_x(head_data)
-    # all_tiles['head_left'] = transpose(head_data)
-    # all_tiles['head_right'] = mirror_y(all_tiles['head_left'])
 
     gen_asm(all_tiles, all_cols, COL_OFFSET, TILE_OFFSET)
 
