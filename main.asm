@@ -32,7 +32,7 @@ main
     jsr txtio.clear
     jsr txtio.home
 
-    lda #GFX_BLACK
+    lda #GFX_GREEN
     sta hires.BACKGROUND_COLOUR
 
     lda #BITMAP_0_MEM/8192
@@ -42,6 +42,7 @@ main
     jsr select.mouseInit
     jsr select.mouseOn    
     jsr hires.on
+    jsr playfield.init
     jsr playfield.test
     jsr select.doSelect
 

@@ -196,6 +196,27 @@ mul8x8BitCoproc .macro oper1, oper2, oper3
     #move16Bit $DE10, \oper3
 .endmacro
 
+mul8x8BitCoprocImm .macro oper1, oper2, oper3
+    lda \oper1
+    sta $DE00
+    stz $DE01
+    lda #\oper2
+    sta $DE02
+    stz $DE03
+    #move16Bit $DE10, \oper3
+.endmacro
+
+mul8x16BitCoproc .macro oper1, oper2, oper3
+    lda \oper1
+    sta $DE00
+    stz $DE01
+    lda #<\oper2
+    sta $DE02
+    lda #>\oper2
+    sta $DE03
+    #move16Bit $DE10, \oper3
+.endmacro
+
 
 copyPtrToStruct .macro ptr, mem, len
     ldy #0
