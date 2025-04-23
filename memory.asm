@@ -214,4 +214,44 @@ linearToSourceAddress
     sta BLIT_PARMS.mmuSrc
     rts
 
+MemSet_t .struct 
+    valToSet     .byte ?
+    startAddress .word ?
+    length       .word ?
+.endstruct
+
+MEM_SET .dstruct MemSet_t
+
+; parameters in MEM_SET
+memSet
+    #move16Bit MEM_SET.startAddress, MEM_PTR1
+memSetInt
+    ldy #0
+_set
+    ; MEM_SET.length + 1 contains the number of full blocks
+    lda MEM_SET.length + 1
+    beq _lastBlockOnly
+    lda MEM_SET.valToSet
+_setBlock
+    sta (MEM_PTR1), y
+    iny
+    bne _setBlock
+    dec MEM_SET.length + 1
+    inc MEM_PTR1+1
+    bra _set
+
+    ; Y register is zero here
+_lastBlockOnly
+    ; MEM_SET.length contains the number of bytes in last block
+    lda MEM_SET.length
+    beq _done
+    lda MEM_SET.valToSet
+_loop
+    sta (MEM_PTR1), y
+    iny
+    cpy MEM_SET.length
+    bne _loop
+_done
+    rts
+
 .endnamespace

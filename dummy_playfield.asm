@@ -1,0 +1,219 @@
+createDummy
+    #load16BitImmediate 320, memory.BLIT_PARMS.lineSize
+    lda #TILE_X
+    sta memory.BLIT_PARMS.objSize
+    lda #TILE_Y
+    sta memory.BLIT_PARMS.numLines
+    #load16BitImmediate memory.overwriteWithTransparency, memory.BLIT_VECTOR
+
+    #setTile 0, 3, 2, 0
+    #setTile 0, 4, 2, 0
+    #setTile 0, 5, 2, 0
+    #setTile 0, 6, 2, 0
+    #setTile 0, 7, 2, 0
+    #setTile 0, 8, 2, 0
+    #setTile 0, 9, 2, 0
+
+    #setTile 0, 3, 2, 1
+    #setTile 0, 4, 2, 1
+    #setTile 0, 5, 2, 1
+    #setTile 0, 6, 2, 1
+    #setTile 0, 7, 2, 1
+    #setTile 0, 8, 2, 1
+    #setTile 0, 9, 2, 1
+
+    #setTile 0, 3, 2, 2
+    #setTile 0, 4, 2, 2
+    #setTile 0, 5, 2, 2
+    #setTile 0, 6, 2, 2
+    #setTile 0, 7, 2, 2
+    #setTile 0, 8, 2, 2
+    #setTile 0, 9, 2, 2
+
+    #setTile 0, 3, 2, 3
+    #setTile 0, 4, 2, 3
+    #setTile 0, 5, 2, 3
+    #setTile 0, 6, 2, 3
+    #setTile 0, 7, 2, 3
+    #setTile 0, 8, 2, 3
+    #setTile 0, 9, 2, 3
+
+    #setTile 0, 3, 2, 4
+    #setTile 0, 4, 2, 4
+    #setTile 0, 5, 2, 4
+    #setTile 0, 6, 2, 4
+    #setTile 0, 7, 2, 4
+    #setTile 0, 8, 2, 4
+    #setTile 0, 9, 2, 4
+
+
+
+
+
+
+
+
+    #setTile 0, 3, 6, 0
+    #setTile 0, 4, 6, 0
+    #setTile 0, 5, 6, 0
+    #setTile 0, 6, 6, 0
+    #setTile 0, 7, 6, 0
+    #setTile 0, 8, 6, 0
+    #setTile 0, 9, 6, 0
+
+    #setTile 0, 3, 6, 1
+    #setTile 0, 4, 6, 1
+    #setTile 0, 5, 6, 1
+    #setTile 0, 6, 6, 1
+    #setTile 0, 7, 6, 1
+    #setTile 0, 8, 6, 1
+    #setTile 0, 9, 6, 1
+
+    #setTile 0, 3, 6, 2
+    #setTile 0, 4, 6, 2
+    #setTile 0, 5, 6, 2
+    #setTile 0, 6, 6, 2
+    #setTile 0, 7, 6, 2
+    #setTile 0, 8, 6, 2
+    #setTile 0, 9, 6, 2
+
+    #setTile 0, 3, 6, 3
+    #setTile 0, 4, 6, 3
+    #setTile 0, 5, 6, 3
+    #setTile 0, 6, 6, 3
+    #setTile 0, 7, 6, 3
+    #setTile 0, 8, 6, 3
+    #setTile 0, 9, 6, 3
+
+    #setTile 0, 3, 6, 4
+    #setTile 0, 4, 6, 4
+    #setTile 0, 5, 6, 4
+    #setTile 0, 6, 6, 4
+    #setTile 0, 7, 6, 4
+    #setTile 0, 8, 6, 4
+    #setTile 0, 9, 6, 4
+
+    
+
+    #setTile 0, 3, 3, 0
+    #setTile 0, 3, 4, 0
+    #setTile 0, 3, 5, 0
+
+    #setTile 0, 3, 3, 1
+    #setTile 0, 3, 4, 1
+    #setTile 0, 3, 5, 1
+
+    #setTile 0, 3, 3, 2
+    #setTile 0, 3, 4, 2
+    #setTile 0, 3, 5, 2
+
+    #setTile 0, 3, 3, 3
+    #setTile 0, 3, 4, 3
+    #setTile 0, 3, 5, 3
+
+    #setTile 0, 3, 3, 4
+    #setTile 0, 3, 4, 4
+    #setTile 0, 3, 5, 4
+
+
+
+
+
+    #setTile 0, 9, 3, 0
+    #setTile 0, 9, 4, 0
+    #setTile 0, 9, 5, 0
+
+    #setTile 0, 9, 3, 1
+    #setTile 0, 9, 4, 1
+    #setTile 0, 9, 5, 1
+
+    #setTile 0, 9, 3, 2
+    #setTile 0, 9, 4, 2
+    #setTile 0, 9, 5, 2
+
+    #setTile 0, 9, 3, 3
+    #setTile 0, 9, 4, 3
+    #setTile 0, 9, 5, 3
+
+    #setTile 0, 9, 3, 4
+    #setTile 0, 9, 4, 4
+    #setTile 0, 9, 5, 4
+
+
+
+    #setTile 0, 3, 0, 0
+    #setTile 0, 3, 1, 0
+
+    #setTile 0, 3, 0, 1
+    #setTile 0, 3, 1, 1
+
+    #setTile 0, 3, 1, 2
+
+
+
+    #setTile 0, 9, 0, 0
+    #setTile 0, 9, 1, 0
+
+    #setTile 0, 9, 0, 1
+    #setTile 0, 9, 1, 1
+
+    #setTile 0, 9, 1, 2
+
+
+
+    #setTile 0, 3, 7, 0
+    #setTile 0, 3, 8, 0
+
+    #setTile 0, 3, 7, 1
+    #setTile 0, 3, 8, 1
+
+    #setTile 0, 3, 7, 2
+
+
+    #setTile 0, 9, 7, 0
+    #setTile 0, 9, 8, 0
+
+    #setTile 0, 9, 7, 1
+    #setTile 0, 9, 8, 1
+
+    #setTile 0, 9, 7, 2
+
+
+
+    #setTile 0, 0, 2, 0
+    #setTile 0, 1, 2, 0
+    #setTile 0, 2, 2, 0
+    #setTile 0, 1, 2, 1
+    #setTile 0, 2, 2, 1
+    #setTile 0, 2, 2, 2
+
+
+    #setTile 0, 0, 6, 0
+    #setTile 0, 1, 6, 0
+    #setTile 0, 2, 6, 0
+    #setTile 0, 1, 6, 1
+    #setTile 0, 2, 6, 1
+    #setTile 0, 2, 6, 2
+
+
+
+    #setTile 0, 10, 2, 0
+    #setTile 0, 10, 2, 1
+    #setTile 0, 10, 2, 2
+
+    #setTile 0, 11, 2, 0
+    #setTile 0, 11, 2, 1
+
+    #setTile 0, 12, 2, 0
+
+
+    #setTile 0, 10, 6, 0
+    #setTile 0, 10, 6, 1
+    #setTile 0, 10, 6, 2
+
+    #setTile 0, 11, 6, 0
+    #setTile 0, 11, 6, 1
+
+    #setTile 1, 12, 6, 0
+
+    rts
