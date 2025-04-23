@@ -7,6 +7,7 @@ FORCE=-f
 PYTHON=python
 CP=cp
 DIST=dist
+TILES=tiles.bin
 
 
 ifdef WIN
@@ -38,14 +39,18 @@ clean:
 	$(RM) $(FORCE) $(BINARY).pgz
 	$(RM) $(FORCE) tests/bin/*.bin
 	$(RM) $(FORCE) *.inc
+	$(RM) $(FORCE) $(TILES)
 	$(RM) $(FORCE) $(DIST)/*
 
 
 upload: $(BINARY).pgz
 	$(SUDO) $(PYTHON) fnxmgr.zip --port $(PORT) --run-pgz $(BINARY).pgz
 
-$(BINARY).pgz: $(BINARY)
-	$(PYTHON) make_pgz.py $(BINARY)
+$(BINARY).pgz: $(BINARY) $(TILES)
+	$(PYTHON) make_pgz.py $(BINARY) $(TILES)
+
+$(TILES): tileset.asm
+	64tass --nostart -o $(TILES) tileset.asm
 
 test:
 	6502profiler verifyall -c config.json -trapaddr 0x07FF

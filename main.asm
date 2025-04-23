@@ -43,7 +43,6 @@ main
     jsr select.mouseOn    
     jsr hires.on
     jsr playfield.init
-    jsr playfield.createDummy
     jsr playfield.drawAll
     jsr select.doSelect
 
