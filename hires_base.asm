@@ -1,4 +1,5 @@
 BITMAP_0_MEM = $40000
+BITMAP_1_MEM = $20000
 
 hires .namespace
 
@@ -14,6 +15,10 @@ BITMAP_0_ADDR_MDL = $D102
 BITMAP_0_ADDR_HI = $D103
 
 BITMAP_1_ENABLE = $D108
+BITMAP_1_ADDR_LOW = $D109
+BITMAP_1_ADDR_MDL = $D10A
+BITMAP_1_ADDR_HI = $D10B
+
 BITMAP_2_ENABLE = $D110
 
 BITMAP_WINDOW = $A000
@@ -48,7 +53,7 @@ init
     #setIo 0
 
     ; setup layers, we want bitmap 0 in layer 0 and bitmap 1 in layer 1
-    lda #LAYER_0_BITMAP_0
+    lda #LAYER_0_BITMAP_0 | LAYER_1_BITMAP_1
     sta LAYER_REG1  
 
     ; Explicitly disable all bitmaps for the moment
@@ -64,17 +69,28 @@ init
     lda #`BITMAP_0_MEM
     sta BITMAP_0_ADDR_HI
 
+    ; set address of bitmap 1 memory, i.e $20000
+    lda #<BITMAP_1_MEM
+    sta BITMAP_1_ADDR_LOW
+    lda #>BITMAP_1_MEM
+    sta BITMAP_1_ADDR_MDL
+    lda #`BITMAP_1_MEM
+    sta BITMAP_1_ADDR_HI
+
     #restoreIo
+
+    stz ACTIVE_LAYER
     rts
 
+ACTIVE_LAYER .byte 0
 
 On
-    jsr hires.checkVBlank
     #saveIo
     #setIo 0
     
-    lda #1
-    sta BITMAP_0_ENABLE
+    stz ACTIVE_LAYER
+    jsr setLayer0
+    jsr layer0On
 
     ; turn on graphics mode on and allow for displaying bitmap layers
     lda # BIT_BITMAP | BIT_GRAPH | BIT_OVERLY | BIT_TEXT
@@ -83,6 +99,70 @@ On
     #restoreIo
     rts
 
+
+switchLayer
+    lda ACTIVE_LAYER
+    beq _active0
+    jsr setLayer0
+    bra _done
+_active0
+    jsr setLayer1
+_done
+    lda ACTIVE_LAYER
+    eor #1
+    sta ACTIVE_LAYER
+    rts
+
+
+showLayer
+    lda ACTIVE_LAYER
+    beq _active0
+    jsr layer1On
+    rts
+_active0
+    jsr layer0On
+    rts
+
+
+layer0On
+    #saveIo
+    #setIo 0
+
+    jsr checkVBlank
+    lda #0
+    sta BITMAP_1_ENABLE
+    lda #1
+    sta BITMAP_0_ENABLE
+
+    #restoreIo
+    rts
+
+
+layer1On
+    #saveIo
+    #setIo 0
+
+    jsr checkVBlank
+
+    lda #0
+    sta BITMAP_0_ENABLE
+    lda #1
+    sta BITMAP_1_ENABLE
+
+    #restoreIo
+    rts
+
+
+setLayer0
+    lda #BITMAP_0_MEM/8192
+    sta memory.BLIT_PARMS.targetRAMblock
+    rts
+
+
+setLayer1
+    lda #BITMAP_1_MEM/8192
+    sta memory.BLIT_PARMS.targetRAMblock
+    rts
 
 ; --------------------------------------------------
 ; This routine turns the bitmap mode off again.

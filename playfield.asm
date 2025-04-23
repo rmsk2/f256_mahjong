@@ -128,6 +128,9 @@ getTileCall
 
 
 drawAll
+    jsr hires.switchLayer
+    jsr hires.clearBitmap
+
     #load16BitImmediate PLAYFIELD, PFIELD_PTR
     stz TILE_PARAM.x
     stz TILE_PARAM.y
@@ -154,6 +157,8 @@ _loop
     sta TILE_PARAM.z
     cmp #NUM_TILES_Z
     bne _loop
+
+    jsr hires.showLayer
     rts    
 
 .include "dummy_playfield.asm"

@@ -91,6 +91,18 @@ procMouseEvent
     rts
 
 
+; setTileExt .macro n, x, y, z
+;     lda #\n
+;     sta playfield.TILE_PARAM.tileNum
+;     lda #\x
+;     sta playfield.TILE_PARAM.x
+;     lda #\y
+;     sta playfield.TILE_PARAM.y
+;     lda #\z
+;     sta playfield.TILE_PARAM.z
+;     jsr playfield.setTileCall
+; .endmacro
+
 POS_CLR .text "   "
 drawMousePos
     #move16Bit MOUSE_POS.x, txtio.WORD_TEMP
@@ -114,6 +126,13 @@ _notClciked
     lda #' '
 _printButtonState
     jsr txtio.charOut
+
+    ; lda BUTTON_STATE
+    ; beq _done
+    ; #cmp16BitImmediate 280, CLICK_POS.x
+    ; bcc _done
+    ; #setTileExt NO_TILE, 12, 6, 0
+    ; jsr playfield.drawAll
 _done
     rts
 
