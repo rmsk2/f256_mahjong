@@ -91,6 +91,9 @@ init
     #setGfxColInt GFX_RED,  $FF, $00, $00, $FF
     #setGfxColInt GFX_GREEN,  $00, $FF, $00, $FF
 
+    TC0 = 7
+    TC2 = 9
+    TC3 = 10
     #setGfxColAlternate TC0, $000000
     #setGfxColAlternate TC2, $cdb79e
     #setGfxColAlternate TC3, $ffffff

@@ -1,7 +1,3 @@
-TC0 = 7
-TC2 = 9
-TC3 = 10
-
 TILE_X = 20
 TILE_Y = 24
 TILE_SIZE = TILE_X * TILE_Y
