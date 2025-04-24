@@ -40,11 +40,12 @@ main
     jsr hires.clearBitmap
 
     jsr select.mouseInit
-    jsr select.mouseOn    
+    jsr select.mouseOn
     jsr hires.on
     jsr playfield.init
     jsr playfield.drawAll
     jsr select.doSelect
+    jsr select.mouseOff
 
     jmp exitToBasic
     rts

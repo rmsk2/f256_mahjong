@@ -55,10 +55,98 @@ TileDrawParam_t .struct
     tilebase  .long 0
 .endstruct
 
+X_C0 = 0
+X_C1 = 3
+X_C2 = 6
+X_C3 = 9
+X_C4 = 12
+
+Y_C0 = 0
+Y_C1 = 3
+Y_C2 = 6
+Y_C3 = 9
+Y_C4 = 12
+
 TILE_PARAM .dstruct TileDrawParam_t
-Z_CORRECT_X .byte 0, 3, 6, 9, 12
-Z_CORRECT_Y .byte 0, 3, 6, 9, 12
+Z_CORRECT_X .byte X_C0, X_C1, X_C2, X_C3, X_C4
+Z_CORRECT_Y .byte Y_C0, Y_C1, Y_C2, Y_C3, Y_C4
 Z_CORRECT .word 0
+
+WIDTH = NUM_TILES_X * TILE_X
+HEIGHT = NUM_TILES_Y * TILE_Y
+
+X_TEMP .word 0
+Y_TEMP .byte 0
+H .byte 0
+checkForTile
+    ldx #4
+_loop    
+    stx TILE_PARAM.z
+    sec
+    lda #X_OFFSET
+    sbc Z_CORRECT_X, x
+    sta H
+
+    sec    
+    lda select.CLICK_POS.x
+    sbc H
+    sta X_TEMP
+    lda select.CLICK_POS.x + 1
+    sbc #0
+    sta X_TEMP + 1
+    #cmp16BitImmediate WIDTH, X_TEMP
+    beq _nexLayer
+    bcc _nexLayer
+
+    sec
+    lda #Y_OFFSET
+    sbc Z_CORRECT_Y, x
+    sta H
+
+    sec
+    lda select.CLICK_POS.y
+    sbc H
+    sta Y_TEMP
+    cmp #HEIGHT
+    bcs _nexLayer
+
+    #load16BitImmediate TILE_X, $DE04
+    #move16Bit X_TEMP, $DE06
+    lda $DE14
+    cmp #NUM_TILES_X
+    bcs _nexLayer
+    sta TILE_PARAM.x
+
+    #load16BitImmediate TILE_Y, $DE04
+    lda Y_TEMP
+    sta $DE06
+    stz $DE07
+    lda $DE14
+    cmp #NUM_TILES_Y
+    bcs _nexLayer
+    sta TILE_PARAM.y
+
+    jsr getTileCall
+    cmp #NO_TILE
+    beq _nexLayer
+    cpx #4 
+    beq _tileFound
+    inc TILE_PARAM.z
+    jsr getTileCall
+    cmp #NO_TILE
+    bne _noTile
+    stx TILE_PARAM.z
+_tileFound
+    sec
+    rts
+_nexLayer
+    dex
+    bmi _noTile
+    jmp _loop
+_noTile
+    clc
+    rts
+    
 
 blitTileCall
     lda TILE_PARAM.tileNum
@@ -125,6 +213,62 @@ getTileCall
     #add16BitImmediate PLAYFIELD, LAYER_ADDR
     lda (LAYER_ADDR)
     rts
+
+
+startRedraw
+    lda #1
+    sta select.REDRAW_IN_PROGRESS
+    stz REDRAW_STATE
+    rts
+
+
+REDRAW_STATE .byte 0
+performRedraw
+    lda REDRAW_STATE
+    bne _doLayer
+
+    jsr hires.switchLayer
+    jsr hires.clearBitmap
+    jsr select.mouseWait
+
+    #load16BitImmediate PLAYFIELD, PFIELD_PTR
+    stz TILE_PARAM.x
+    stz TILE_PARAM.y
+    stz TILE_PARAM.z
+    inc REDRAW_STATE
+    rts
+_doLayer
+    cmp #46
+    beq _finishRedraw
+
+_loop
+    lda (PFIELD_PTR)
+    sta TILE_PARAM.tileNum
+    jsr blitTileCall
+    #inc16Bit PFIELD_PTR
+    lda TILE_PARAM.x
+    ina
+    sta TILE_PARAM.x
+    cmp #NUM_TILES_X
+    bne _loop
+
+    stz TILE_PARAM.x
+    lda TILE_PARAM.y
+    ina
+    sta TILE_PARAM.y
+    cmp #NUM_TILES_Y
+    bne _lineDone
+    stz TILE_PARAM.y
+    inc TILE_PARAM.z
+_lineDone
+    inc REDRAW_STATE
+    rts
+
+_finishRedraw
+    jsr hires.showLayer
+    stz select.REDRAW_IN_PROGRESS
+    jsr select.mouseNormal
+    rts    
 
 
 drawAll

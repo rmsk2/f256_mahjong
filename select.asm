@@ -15,8 +15,14 @@ doSelect
 eventLoop
     ; Peek at the queue to see if anything is pending
     lda kernel.args.events.pending ; Negated count
-    bpl eventLoop
+    bmi _newEvent
     ; Get the next event.
+    lda REDRAW_IN_PROGRESS
+    beq eventLoop
+    ; do redraw if no events are to be processed
+    jsr playfield.performRedraw
+    bra eventLoop
+_newEvent
     jsr kernel.NextEvent
     bcs eventLoop
     ; Handle the event
@@ -47,6 +53,9 @@ mouseInit
     #load16BitImmediate 0, CLICK_POS.x
     #load16BitImmediate 0, CLICK_POS.y
     stz BUTTON_STATE
+    stz MOUSE_DOWN
+    stz REDRAW_IN_PROGRESS
+    jsr mouseNormal
     rts
 
 
@@ -91,17 +100,17 @@ procMouseEvent
     rts
 
 
-; setTileExt .macro n, x, y, z
-;     lda #\n
-;     sta playfield.TILE_PARAM.tileNum
-;     lda #\x
-;     sta playfield.TILE_PARAM.x
-;     lda #\y
-;     sta playfield.TILE_PARAM.y
-;     lda #\z
-;     sta playfield.TILE_PARAM.z
-;     jsr playfield.setTileCall
-; .endmacro
+setTileExt .macro n, x, y, z
+    lda #\n
+    sta playfield.TILE_PARAM.tileNum
+    lda #\x
+    sta playfield.TILE_PARAM.x
+    lda #\y
+    sta playfield.TILE_PARAM.y
+    lda #\z
+    sta playfield.TILE_PARAM.z
+    jsr playfield.setTileCall
+.endmacro
 
 POS_CLR .text "   "
 drawMousePos
@@ -127,12 +136,14 @@ _notClciked
 _printButtonState
     jsr txtio.charOut
 
-    ; lda BUTTON_STATE
-    ; beq _done
-    ; #cmp16BitImmediate 280, CLICK_POS.x
-    ; bcc _done
-    ; #setTileExt NO_TILE, 12, 6, 0
-    ; jsr playfield.drawAll
+    lda MOUSE_DOWN
+    beq _done
+    jsr playfield.checkForTile
+    bcc _done
+    lda #NO_TILE
+    sta playfield.TILE_PARAM.tileNum
+    jsr playfield.setTileCall
+    jsr playfield.startRedraw
 _done
     rts
 
@@ -160,8 +171,6 @@ SIGN           .byte 0                                    ; raw sign of delta se
 SPEED          .byte 0                                    ; determined speed (slow, medium or fast)
 OFFSET         .byte 0, 0                                 ; calculated number of pixels to move the mouse pointer
 PRIMARY_BUTTON .byte LEFT_BUTTON                          ; select left or right handedness 
-BUTTON_STATE   .byte 0                                    ; state of the primary button
-
 
 THRESHOLD_MOVE_X .byte 2                                  ; You need THRESHOLD_MOVE_X kernel messages in x direction to move the pointer at all when in slow mode
 THRESHOLD_MEDIUM_X .byte 5                                ; Absolute delta in X direction that signifies a medium speed
@@ -184,6 +193,9 @@ ClickPos_t .struct
     y .word 0
 .endstruct
 
+BUTTON_STATE   .byte 0                                    ; state of the primary button
+MOUSE_DOWN     .byte 0
+REDRAW_IN_PROGRESS .byte 0
 CLICK_POS .dstruct ClickPos_t
 MOUSE_POS .dstruct ClickPos_t
 
@@ -366,14 +378,31 @@ _done
     rts
 
 
+OLD_STATE .byte 0
+TEMP_REDRAW .byte 0
 ; record mouse clicks made with the primary button. Return with carry
-; set if mouse was clicked. Else carry is clear.
+; set if mouse was buttton changes from not pressed to pressed (MOUSE_DOWN event).
+; Else carry is clear.
 mouseClick
+    lda BUTTON_STATE
+    sta OLD_STATE
+    stz MOUSE_DOWN
+
     lda myEvent.mouse.delta.buttons
     and PRIMARY_BUTTON
     beq _notPressed
     lda #BUTTON_IS_PRESSED
     sta BUTTON_STATE
+
+    lda OLD_STATE
+    eor #BUTTON_IS_PRESSED
+    tax
+    lda REDRAW_IN_PROGRESS
+    eor #1
+    sta TEMP_REDRAW
+    txa
+    and TEMP_REDRAW
+    beq _noMouseDown
 
     #move16Bit $D6E2, CLICK_POS.x
     #halve16Bit CLICK_POS.x
@@ -381,13 +410,81 @@ mouseClick
     #move16Bit $D6E4, CLICK_POS.y
     #halve16Bit CLICK_POS.y
 
+    ; carry is set if the mouse button was not pressed
+    ; and now it has been pressed and no redraw must be
+    ; in progress.
     sec
+    inc MOUSE_DOWN
     bra _done
 _notPressed
     lda #BUTTON_IS_NOT_PRESSED
     sta BUTTON_STATE
+_noMouseDown
     clc
 _done
     rts
+
+
+mouseWait
+    #saveIo
+    ldx #0
+_loop
+    lda MOUSE_WAIT, x
+    sta $CC00, x
+    inx
+    bne _loop
+    #setIo 0
+    #restoreIo
+    rts
+
+
+mouseNormal
+    #saveIo
+    ldx #0
+_loop
+    lda MOUSE_NORMAL, x
+    sta $CC00, x
+    inx
+    bne _loop
+    #setIo 0
+    #restoreIo
+    rts
+
+
+MOUSE_WAIT
+    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0
+    .byte 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0
+    .byte 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0
+    .byte 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0
+    .byte 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+
+MOUSE_NORMAL
+    .byte 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0
+    .byte 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0
+    .byte 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0
+    .byte 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 .endnamespace
