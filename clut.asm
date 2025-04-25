@@ -82,33 +82,19 @@ setGfxColAlternate .macro colNum, val
     sta GFX_LUT_BASE + (\colNum * 4) + 3
 .endmacro
 
+PALLETTE_ADDR
+.include "pallette.asm"
+
 init
     #saveIo
 
     #setIo 1
-    #setGfxColInt GFX_WHITE,  $FF, $FF, $FF, $FF
-    #setGfxColInt GFX_BLUE,  $00, $00, $FF, $FF
-    #setGfxColInt GFX_RED,  $FF, $00, $00, $FF
-    #setGfxColInt GFX_GREEN,  $00, $FF, $00, $FF
-
-    TC0 = 7
-    TC2 = 9
-    TC3 = 10
-    #setGfxColAlternate TC0, $000000
-    #setGfxColAlternate TC2, $cdb79e
-    #setGfxColAlternate TC3, $ffffff
-
-
-    ; #setGfxColInt 5,  $01, $FF, $E4, $FF
-    ; #setGfxColInt 6,  $01, $9D, $FF, $FF
-    ; #setGfxColInt 7,  $05, $01, $FF, $FF
-    ; #setGfxColInt 8,  $8B, $01, $FF, $FF
-    ; #setGfxColInt 9,  $FF, $01, $F6, $FF
-    ; #setGfxColInt 10, $FF, $01, $79, $FF
-    ; #setGfxColInt 11, $FF, $FF, $FF, $FF
-    ; #setGfxColInt 12, $ED, $FF, $01, $FF
-    ; #setGfxColInt 13, $01, $FF, $C1, $FF
     
+    #load16BitImmediate PALLETTE_ADDR, memory.MEM_CPY.startAddress
+    #load16BitImmediate GFX_LUT_BASE, memory.MEM_CPY.targetAddress
+    #load16BitImmediate $0400, memory.MEM_CPY.length
+    jsr memory.memCpy
+
     #setIo 0
     #setTxtColInt TXT_BLACK,  $00, $00, $00, $FF
     #setTxtColInt TXT_WHITE,  $FF, $FF, $FF, $FF

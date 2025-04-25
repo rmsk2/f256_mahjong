@@ -50,7 +50,7 @@ $(BINARY).pgz: $(BINARY) $(TILES)
 	$(PYTHON) make_pgz.py $(BINARY) $(TILES)
 
 $(TILES): tileset.asm
-	64tass --nostart -o $(TILES) tileset.asm
+	64tass --nostart -o $(TILES) tileset_real.asm
 
 test:
 	6502profiler verifyall -c config.json -trapaddr 0x07FF

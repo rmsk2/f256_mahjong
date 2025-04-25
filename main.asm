@@ -32,7 +32,7 @@ main
     jsr txtio.clear
     jsr txtio.home
 
-    lda #GFX_GREEN
+    lda #255-12
     sta hires.BACKGROUND_COLOUR
 
     lda #BITMAP_0_MEM/8192

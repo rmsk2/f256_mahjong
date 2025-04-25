@@ -28,13 +28,13 @@ createDummy
     #setTile 0, 7, 2, 3
     #setTile 0, 8, 2, 3
     #setTile 0, 9, 2, 3
-    #setTile 0, 3, 2, 4
-    #setTile 0, 4, 2, 4
-    #setTile 0, 5, 2, 4
-    #setTile 0, 6, 2, 4
-    #setTile 0, 7, 2, 4
-    #setTile 0, 8, 2, 4
-    #setTile 0, 9, 2, 4
+    #setTile 16, 3, 2, 4
+    #setTile 15, 4, 2, 4
+    #setTile 14, 5, 2, 4
+    #setTile 13, 6, 2, 4
+    #setTile 12, 7, 2, 4
+    #setTile 11, 8, 2, 4
+    #setTile 10, 9, 2, 4
     ; lower wall
     #setTile 0, 3, 6, 0
     #setTile 0, 4, 6, 0
@@ -64,13 +64,13 @@ createDummy
     #setTile 0, 7, 6, 3
     #setTile 0, 8, 6, 3
     #setTile 0, 9, 6, 3
-    #setTile 0, 3, 6, 4
-    #setTile 0, 4, 6, 4
-    #setTile 0, 5, 6, 4
-    #setTile 0, 6, 6, 4
-    #setTile 0, 7, 6, 4
-    #setTile 0, 8, 6, 4
-    #setTile 0, 9, 6, 4
+    #setTile 18, 3, 6, 4
+    #setTile 17, 4, 6, 4
+    #setTile 4, 5, 6, 4
+    #setTile 3, 6, 6, 4
+    #setTile 2, 7, 6, 4
+    #setTile 1, 8, 6, 4
+    #setTile 42, 9, 6, 4
     ; left wall
     #setTile 0, 3, 3, 0
     #setTile 0, 3, 4, 0
@@ -84,9 +84,9 @@ createDummy
     #setTile 0, 3, 3, 3
     #setTile 0, 3, 4, 3
     #setTile 0, 3, 5, 3
-    #setTile 0, 3, 3, 4
-    #setTile 0, 3, 4, 4
-    #setTile 0, 3, 5, 4
+    #setTile 7, 3, 3, 4
+    #setTile 6, 3, 4, 4
+    #setTile 5, 3, 5, 4
     ; right wall
     #setTile 0, 9, 3, 0
     #setTile 0, 9, 4, 0
@@ -100,59 +100,59 @@ createDummy
     #setTile 0, 9, 3, 3
     #setTile 0, 9, 4, 3
     #setTile 0, 9, 5, 3
-    #setTile 0, 9, 3, 4
-    #setTile 0, 9, 4, 4
-    #setTile 0, 9, 5, 4
+    #setTile 41, 9, 3, 4
+    #setTile 9, 9, 4, 4
+    #setTile 8, 9, 5, 4
     ; upper left vertical nose
     #setTile 0, 3, 0, 0
     #setTile 0, 3, 1, 0
-    #setTile 0, 3, 0, 1
+    #setTile 23, 3, 0, 1
     #setTile 0, 3, 1, 1
-    #setTile 0, 3, 1, 2
+    #setTile 24, 3, 1, 2
     ; upper right vertical nose
-    #setTile 0, 9, 0, 0
+    #setTile 22, 9, 0, 0
     #setTile 0, 9, 1, 0
-    #setTile 0, 9, 0, 1
+    #setTile 25, 9, 0, 1
     #setTile 0, 9, 1, 1
-    #setTile 0, 9, 1, 2
+    #setTile 19, 9, 1, 2
     ; lower left vertical nose
-    #setTile 0, 3, 7, 0
+    #setTile 21, 3, 7, 0
     #setTile 0, 3, 8, 0
-    #setTile 0, 3, 7, 1
-    #setTile 0, 3, 8, 1
-    #setTile 0, 3, 7, 2
+    #setTile 26, 3, 7, 1
+    #setTile 26, 3, 8, 1
+    #setTile 20, 3, 7, 2
     ; lower right vertical nose
     #setTile 0, 9, 7, 0
     #setTile 0, 9, 8, 0
     #setTile 0, 9, 7, 1
-    #setTile 0, 9, 8, 1
-    #setTile 0, 9, 7, 2
+    #setTile 38, 9, 8, 1
+    #setTile 37, 9, 7, 2
     ; upper left horizontal nose
-    #setTile 0, 0, 2, 0
+    #setTile 35, 0, 2, 0
     #setTile 0, 1, 2, 0
     #setTile 0, 2, 2, 0
-    #setTile 0, 1, 2, 1
+    #setTile 36, 1, 2, 1
     #setTile 0, 2, 2, 1
-    #setTile 0, 2, 2, 2
+    #setTile 34, 2, 2, 2
     ; lower left horizontal nose
-    #setTile 0, 0, 6, 0
+    #setTile 33, 0, 6, 0
     #setTile 0, 1, 6, 0
     #setTile 0, 2, 6, 0
     #setTile 0, 1, 6, 1
     #setTile 0, 2, 6, 1
-    #setTile 0, 2, 6, 2
+    #setTile 32, 2, 6, 2
     ; upper right horizontal nose
-    #setTile 0, 10, 2, 0
+    #setTile 30, 10, 2, 0
     #setTile 0, 10, 2, 1
-    #setTile 0, 10, 2, 2
+    #setTile 29, 10, 2, 2
     #setTile 0, 11, 2, 0
-    #setTile 0, 11, 2, 1
-    #setTile 0, 12, 2, 0
+    #setTile 31, 11, 2, 1
+    #setTile 40, 12, 2, 0
     ; lower right horizontal nose
     #setTile 0, 10, 6, 0
-    #setTile 0, 10, 6, 1
-    #setTile 0, 10, 6, 2
+    #setTile 28, 10, 6, 1
+    #setTile 27, 10, 6, 2
     #setTile 0, 11, 6, 0
-    #setTile 0, 11, 6, 1
-    #setTile 1, 12, 6, 0
+    #setTile 28, 11, 6, 1
+    #setTile 39, 12, 6, 0
     rts

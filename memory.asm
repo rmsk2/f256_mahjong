@@ -254,4 +254,48 @@ _loop
 _done
     rts
 
+MemCpy_t .struct 
+    startAddress  .word ?
+    targetAddress .word ?
+    length        .word ?
+.endstruct
+
+MEM_CPY .dstruct MemCpy_t
+
+; parameters in MEM_CPY
+; works only for non overlapping slices of memory
+memCpy
+    #move16Bit MEM_CPY.startAddress, MEM_PTR1
+    #move16Bit MEM_CPY.targetAddress, MEM_PTR2
+memCpyInt    
+    ldy #0
+_copy
+    ; MEM_CPY.length + 1 contains the number of full blocks
+    lda MEM_CPY.length + 1
+    beq _lastBlockOnly
+_copyBlock
+    lda (MEM_PTR1), y
+    sta (MEM_PTR2), y
+    iny
+    bne _copyBlock
+    dec MEM_CPY.length + 1
+    inc MEM_PTR1+1
+    inc MEM_PTR2+1
+    bra _copy
+
+    ; Y register is zero here
+_lastBlockOnly
+    ; MEM_CPY.length contains the number of bytes in last block
+    lda MEM_CPY.length
+    beq _done
+_loop
+    lda (MEM_PTR1), y
+    sta (MEM_PTR2), y
+    iny
+    cpy MEM_CPY.length
+    bne _loop
+_done
+    rts
+
+
 .endnamespace
