@@ -92,8 +92,8 @@ On
     jsr setLayer0
     jsr layer0On
 
-    ; turn on graphics mode on and allow for displaying bitmap layers
-    lda # BIT_BITMAP | BIT_GRAPH | BIT_OVERLY | BIT_TEXT
+    ; turn on graphics mode on and allow for displaying bitmap layers and a sprite layer
+    lda # BIT_BITMAP | BIT_GRAPH | BIT_OVERLY | BIT_TEXT | BIT_SPRITE
     sta VKY_MSTR_CTRL_0
     stz VKY_MSTR_CTRL_1    
     #restoreIo

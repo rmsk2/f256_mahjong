@@ -84,7 +84,7 @@ createDummy
     #setTile 0, 3, 3, 3
     #setTile 0, 3, 4, 3
     #setTile 0, 3, 5, 3
-    #setTile 7, 3, 3, 4
+    #setTile 8, 3, 3, 4
     #setTile 6, 3, 4, 4
     #setTile 5, 3, 5, 4
     ; right wall

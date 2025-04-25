@@ -15,6 +15,7 @@ jmp main
 .include "select.asm"
 .include "playfield.asm"
 .include "memory.asm"
+.include "sprite.asm"
 
 
 main
@@ -23,6 +24,7 @@ main
     jsr initEvents
 
     jsr hires.init
+    jsr sprite.init
     jsr random.init
     jsr clut.init
     jsr txtio.init
@@ -44,6 +46,7 @@ main
     jsr hires.on
     jsr playfield.init
     jsr playfield.drawAll
+    jsr sprite.frameOn
     jsr select.doSelect
     jsr select.mouseOff
 

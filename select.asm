@@ -2,8 +2,6 @@ select .namespace
 
 
 doSelect
-    jsr drawMousePos
-
     jsr eventLoop
     
     jsr hires.off
@@ -96,53 +94,33 @@ procMouseEvent
     jsr mouseLeftRight
     jsr mouseUpDown
     #restoreIo
-    jsr drawMousePos
+    jsr processMouseState
     rts
 
 
-setTileExt .macro n, x, y, z
-    lda #\n
-    sta playfield.TILE_PARAM.tileNum
-    lda #\x
-    sta playfield.TILE_PARAM.x
-    lda #\y
-    sta playfield.TILE_PARAM.y
-    lda #\z
-    sta playfield.TILE_PARAM.z
-    jsr playfield.setTileCall
-.endmacro
-
-POS_CLR .text "   "
-drawMousePos
-    #move16Bit MOUSE_POS.x, txtio.WORD_TEMP
-    #locate 72, 6
-    #printString POS_CLR, len(POS_CLR)
-    #locate 72, 6
-    jsr txtio.printWordDecimal
-
-    #move16Bit MOUSE_POS.y, txtio.WORD_TEMP
-    #locate 72, 7
-    #printString POS_CLR, len(POS_CLR)
-    #locate 72, 7
-    jsr txtio.printWordDecimal
-    
-    #locate 72, 8
-    lda BUTTON_STATE
-    beq _notClciked
-    lda #214
-    bra _printButtonState
-_notClciked
-    lda #' '
-_printButtonState
-    jsr txtio.charOut
-
+processMouseState
     lda MOUSE_DOWN
     beq _done
     jsr playfield.checkForTile
     bcc _done
-    lda #NO_TILE
-    sta playfield.TILE_PARAM.tileNum
-    jsr playfield.setTileCall
+    jsr playfield.isTileFree
+    bcc _done
+    lda playfield.A_TILE_IS_SELECTED
+    bne _checkEqual
+    jsr playfield.selectTile
+    rts
+_checkEqual
+    jsr playfield.selectedEqual
+    bcc _checkSameValue
+    jsr playfield.unselectTile
+    rts
+_checkSameValue
+    jsr playfield.selectedMatch
+    bcs _eraseTiles
+    jsr playfield.selectTile
+    rts
+_eraseTiles
+    jsr playfield.erasePair
     jsr playfield.startRedraw
 _done
     rts
