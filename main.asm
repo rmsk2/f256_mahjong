@@ -50,7 +50,7 @@ main
     jsr select.doSelect
     jsr select.mouseOff
 
-    jmp exitToBasic
+    jmp sys64738
     rts
 
 

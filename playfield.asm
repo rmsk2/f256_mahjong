@@ -33,23 +33,11 @@ init
     lda #144
     sta TILES_LEFT
 
-    jsr createDummy
+    jsr fillPlayfield
     jsr printTilesLeft
 
     rts
 
-
-setTile .macro n, x, y, z
-    lda #\n
-    sta TILE_PARAM.tileNum
-    lda #\x
-    sta TILE_PARAM.x
-    lda #\y
-    sta TILE_PARAM.y
-    lda #\z
-    sta TILE_PARAM.z
-    jsr setTileCall
-.endmacro
 
 TileDrawParam_t .struct
     tileNum   .byte 0
@@ -339,6 +327,31 @@ _equal
     rts
 
 
+isSpecial .macro start, end
+    cmp #\start
+    bcc _done
+    cmp #\end+1
+    bcc _ok
+    clc
+    bra _done
+_ok
+    sec
+_done
+    lda #0
+    rol
+.endmacro
+
+isSeason
+    #isSpecial 39, 42
+    rts
+
+
+isFlower
+    #isSpecial 35, 38
+    rts
+
+
+TYPE_TEMP .byte 0
 ; carry is set if selected tile is of the same type as the current tile.
 selectedMatch
     lda A_TILE_IS_SELECTED
@@ -351,6 +364,24 @@ _checkFurther
     lda (LAYER_ADDR)
     cmp (LAYER_ADDR_SELECTED)
     beq _equal
+    
+    ; check for seasons
+    lda (LAYER_ADDR)
+    jsr isSeason
+    sta TYPE_TEMP
+    lda (LAYER_ADDR_SELECTED)
+    jsr isSeason
+    and TYPE_TEMP
+    bne _equal
+
+    ; check for flowers
+    lda (LAYER_ADDR)
+    jsr isFlower
+    sta TYPE_TEMP
+    lda (LAYER_ADDR_SELECTED)
+    jsr isFlower
+    and TYPE_TEMP
+    bne _equal
     clc
     rts
 _equal
@@ -358,10 +389,11 @@ _equal
     rts
 
 
-TILES_LEFT_TXT .text "Tiles left: "
+TILES_LEFT_TXT .text "Tiles left:    "
 printTilesLeft
     #locate 60, 3
     #printString TILES_LEFT_TXT, len(TILES_LEFT_TXT)
+    #locate 72, 3
     #move16Bit TILES_LEFT, txtio.WORD_TEMP
     jsr txtio.printWordDecimal
     rts
@@ -463,6 +495,6 @@ _loop
     jsr hires.showLayer
     rts    
 
-.include "dummy_playfield.asm"
+.include "fill_playfield.asm"
 
 .endnamespace
