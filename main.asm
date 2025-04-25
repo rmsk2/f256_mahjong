@@ -30,7 +30,7 @@ main
     jsr txtio.init
     jsr txtio.cursorOff
  
-    #setCol (TXT_BLUE << 4) | (TXT_WHITE)
+    #setCol (TXT_BLACK << 4) | (TXT_WHITE)
     jsr txtio.clear
     jsr txtio.home
 

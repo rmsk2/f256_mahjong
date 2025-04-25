@@ -30,8 +30,11 @@ init
     sta memory.BLIT_PARMS.numLines
     #load16BitImmediate memory.overwriteWithTransparency, memory.BLIT_VECTOR
     stz A_TILE_IS_SELECTED
+    lda #144
+    sta TILES_LEFT
 
     jsr createDummy
+    jsr printTilesLeft
 
     rts
 
@@ -76,6 +79,7 @@ Z_CORRECT .word 0
 
 SELECTED_TILE .dstruct TileDrawParam_t
 A_TILE_IS_SELECTED .byte 0
+TILES_LEFT .word 0
 
 WIDTH = NUM_TILES_X * TILE_X
 HEIGHT = NUM_TILES_Y * TILE_Y
@@ -354,12 +358,23 @@ _equal
     rts
 
 
+TILES_LEFT_TXT .text "Tiles left: "
+printTilesLeft
+    #locate 60, 3
+    #printString TILES_LEFT_TXT, len(TILES_LEFT_TXT)
+    #move16Bit TILES_LEFT, txtio.WORD_TEMP
+    jsr txtio.printWordDecimal
+    rts
+
+
 erasePair
     #move16Bit TILE_PARAM.tileMem, LAYER_ADDR
     #move16Bit SELECTED_TILE.tileMem, LAYER_ADDR_SELECTED
     lda #NO_TILE
     sta (LAYER_ADDR)
     sta (LAYER_ADDR_SELECTED)
+    dec TILES_LEFT
+    dec TILES_LEFT
     rts
 
 
@@ -410,6 +425,7 @@ _finishRedraw
     stz select.REDRAW_IN_PROGRESS
     jsr select.mouseNormal
     jsr unselectTile
+    jsr printTilesLeft
     rts    
 
 
