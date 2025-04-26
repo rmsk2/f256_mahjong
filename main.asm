@@ -51,7 +51,6 @@ _restart
     jsr hires.on
     jsr playfield.init
     jsr playfield.drawAll
-    jsr sprite.frameOn
     jsr select.doSelect
     jsr select.mouseOff
 

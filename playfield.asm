@@ -29,6 +29,7 @@ init
     lda #TILE_Y
     sta memory.BLIT_PARMS.numLines
     #load16BitImmediate memory.overwriteWithTransparency, memory.BLIT_VECTOR
+    jsr unselectTile
     stz A_TILE_IS_SELECTED
     lda #144
     sta TILES_LEFT
