@@ -57,19 +57,33 @@ shuffle
     stz $DE07    
 _loop
     jsr random.get
+    ; calculate rand value in x mod 144
     stx $DE06
     ldx $DE16
+    ; store as index in RAND_SRC
     stx RAND_SRC
+    ; calculate rand value in a mod 144
     sta $DE06
     lda $DE16
-    sta RAND_SRC
+    ; store as index in RAND_TARGET
+    sta RAND_TARGET
+    ;
+    ; swap values at indices RAND_SOURCE and RAND_TARGET
+    ;
+    ; Load value at index RAND_SOURCE and store it in y-register
     ldx RAND_SRC
     lda SHUFFLED_TILES, x
+    ; move value to y
     tay
+    
+    ; load value at index RAND_TARGET
     ldx RAND_TARGET
     lda SHUFFLED_TILES, x
+    ; store value from index RAND_TARGET at index RAND_SRC
     ldx RAND_SRC
     sta SHUFFLED_TILES, x
+
+    ; store value in y (read from RAND_SRC) ant RAND_TARGET
     ldx RAND_TARGET
     tya
     sta SHUFFLED_TILES, x

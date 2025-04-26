@@ -83,6 +83,8 @@ mouseOff
 
 
 procKeyPressed
+    lda myEvent.key.ascii
+    sta KEY_PRESSED
     sec
     rts
 

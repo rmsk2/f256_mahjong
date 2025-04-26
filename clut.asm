@@ -22,6 +22,7 @@ GFX_BLUE = 2
 TXT_BLACK = 0
 TXT_WHITE = 1
 TXT_BLUE = 2
+TXT_GREEN = 3
 
 clut .namespace
 
@@ -99,6 +100,7 @@ init
     #setTxtColInt TXT_BLACK,  $00, $00, $00, $FF
     #setTxtColInt TXT_WHITE,  $FF, $FF, $FF, $FF
     #setTxtColInt TXT_BLUE,  $00, $00, $FF, $FF
+    #setTxtColInt TXT_GREEN,  $00, $FF, $00, $FF
     ; #setTxtColInt 3,  $00, $CF, $00, $FF
     ; #setTxtColInt 4,  $00, $BF, $00, $FF
     ; #setTxtColInt 5,  $00, $AF, $00, $FF
