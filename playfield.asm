@@ -17,11 +17,8 @@ playfield .namespace
 
 init
     #load24BitImmediate TILE_DATA, TILE_PARAM.tileBase
-    lda #NO_TILE
-    sta memory.MEM_SET.valToSet
-    #load16BitImmediate PLAYFIELD, memory.MEM_SET.startAddress
-    #load16BitImmediate PLAYFIELD_SIZE, memory.MEM_SET.length
-    jsr memory.memSet
+    #load16BitImmediate PLAYFIELD_MAIN, PLAYFIELD_VEC
+    jsr clearPlayfield
 
     #load16BitImmediate 320, memory.BLIT_PARMS.lineSize
     lda #TILE_X
@@ -37,6 +34,16 @@ init
     jsr fillPlayfield
     jsr printTilesLeft
 
+    rts
+
+
+clearPlayfield
+    lda #NO_TILE
+setPlayField
+    sta memory.MEM_SET.valToSet
+    #move16Bit PLAYFIELD_VEC, memory.MEM_SET.startAddress
+    #load16BitImmediate PLAYFIELD_SIZE, memory.MEM_SET.length
+    jsr memory.memSet
     rts
 
 
@@ -254,7 +261,11 @@ _draw
     rts
 
 
-PLAYFIELD .fill PLAYFIELD_SIZE
+PLAYFIELD_VEC .word PLAYFIELD_MAIN
+
+PLAYFIELD_MAIN .fill PLAYFIELD_SIZE
+PLAYFIELD_GEN  .fill PLAYFIELD_SIZE
+FREE_LIST      .fill NUM_TILES_X * NUM_TILES_Y * 2
 
 CELL_ADDR  .word 0
 setTileCall
@@ -262,7 +273,7 @@ setTileCall
     #mul8x8BitCoprocImm TILE_PARAM.y, NUM_TILES_X, CELL_ADDR
     #add16Bit CELL_ADDR, LAYER_ADDR
     #add16BitByte TILE_PARAM.x, LAYER_ADDR
-    #add16BitImmediate PLAYFIELD, LAYER_ADDR
+    #add16Bit PLAYFIELD_VEC, LAYER_ADDR
     lda TILE_PARAM.tileNum
     sta (LAYER_ADDR)
     rts
@@ -273,7 +284,7 @@ getTileCall
     #mul8x8BitCoprocImm TILE_PARAM.y, NUM_TILES_X, CELL_ADDR
     #add16Bit CELL_ADDR, LAYER_ADDR
     #add16BitByte TILE_PARAM.x, LAYER_ADDR
-    #add16BitImmediate PLAYFIELD, LAYER_ADDR
+    #add16Bit PLAYFIELD_VEC, LAYER_ADDR
     #move16Bit LAYER_ADDR, TILE_PARAM.tileMem
     lda (LAYER_ADDR)
     rts
@@ -420,7 +431,7 @@ performRedraw
     jsr hires.clearBitmap
     jsr select.mouseWait
 
-    #load16BitImmediate PLAYFIELD, PFIELD_PTR
+    #move16Bit PLAYFIELD_VEC, PFIELD_PTR
     stz TILE_PARAM.x
     stz TILE_PARAM.y
     stz TILE_PARAM.z
@@ -466,7 +477,7 @@ drawAll
     jsr hires.switchLayer
     jsr hires.clearBitmap
 
-    #load16BitImmediate PLAYFIELD, PFIELD_PTR
+    #move16Bit PLAYFIELD_VEC, PFIELD_PTR
     stz TILE_PARAM.x
     stz TILE_PARAM.y
     stz TILE_PARAM.z
