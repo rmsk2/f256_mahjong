@@ -10,6 +10,9 @@ X_OFFSET = 18
 Y_OFFSET = 18
 
 NO_TILE = $FF
+GROUP_SEASONS = 100
+GROUP_FLOWERS = 101
+
 PLAYFIELD_SIZE = NUM_TILES_X * NUM_TILES_Y * NUM_TILES_Z
 TILE_DATA = $10000
 
@@ -33,13 +36,14 @@ init
 
     jsr fillPlayfield
     jsr printTilesLeft
+    jsr checkPossibleMove
 
     rts
 
 
 clearPlayfield
     lda #NO_TILE
-setPlayField
+setPlayfield
     sta memory.MEM_SET.valToSet
     #move16Bit PLAYFIELD_VEC, memory.MEM_SET.startAddress
     #load16BitImmediate PLAYFIELD_SIZE, memory.MEM_SET.length
@@ -265,7 +269,146 @@ PLAYFIELD_VEC .word PLAYFIELD_MAIN
 
 PLAYFIELD_MAIN .fill PLAYFIELD_SIZE
 PLAYFIELD_GEN  .fill PLAYFIELD_SIZE
-FREE_LIST      .fill NUM_TILES_X * NUM_TILES_Y * 2
+
+FreeList_t .struct
+    data   .fill NUM_TILES_X * NUM_TILES_Y * 2
+    values .fill NUM_TILES_X * NUM_TILES_Y
+    len  .byte 0
+.endstruct
+
+FREE_LIST  .dstruct FreeList_t
+
+
+LAYER_COUNTER .byte 0
+
+determineTopLayer
+    lda #4
+    sta LAYER_COUNTER
+_loop
+    lda LAYER_COUNTER
+    sta TILE_PARAM.z
+    jsr getTileCall
+    cmp #NO_TILE
+    bne _done
+    dec LAYER_COUNTER
+    bpl _loop
+_done
+    rts
+
+
+getAllFreeTiles
+    stz FREE_LIST .len
+    ldx #0
+    ldy #0
+_loop
+    stx TILE_PARAM.x
+    sty TILE_PARAM.y
+    stz TILE_PARAM.z
+    jsr getTileCall
+    cmp #NO_TILE
+    beq _next
+    ; we have at least one tile in the column x, y
+    jsr determineTopLayer
+    lda LAYER_COUNTER
+    sta TILE_PARAM.z
+    phy
+    jsr isTileFree
+    ply
+    bcc _next
+    phx
+    ; determine start byte in free list
+    lda FREE_LIST.len
+    asl
+    tax
+    ; index of byte to write is now in x-register
+    lda TILE_PARAM.x
+    ; store x corrdinate in free list
+    sta FREE_LIST.data,x
+    ; load y coordinate
+    lda TILE_PARAM.y
+    ; move value to upper 4 bits
+    asl
+    asl
+    asl
+    asl
+    ora FREE_LIST.data,x
+    ; write x and y coordinates to free list
+    sta FREE_LIST.data,x
+    inx
+    ; write z coordinate into free lest
+    lda TILE_PARAM.z
+    sta FREE_LIST.data,x
+    ; save tile value
+    #move16Bit TILE_PARAM.tileMem, LAYER_ADDR
+    lda (LAYER_ADDR)
+    jsr isFlower
+    bcc _noFlower
+    lda #GROUP_FLOWERS
+    bra _writeTileVal
+_noFlower
+    lda (LAYER_ADDR)
+    jsr isSeason
+    bcc _noSpecial
+    lda #GROUP_SEASONS
+    bra _writeTileVal
+_noSpecial
+    lda (LAYER_ADDR)
+_writeTileVal
+    ldx FREE_LIST.len
+    sta FREE_LIST.values, x
+    plx
+    ; increment free list counter
+    inc FREE_LIST.len
+_next
+    inx
+    cpx #NUM_TILES_X
+    bne _loop
+    ldx #0
+    iny
+    cpy #NUM_TILES_Y
+    bne _loop
+
+    rts
+
+
+TILE_SET_FLAGS .fill 256
+
+; carry is clear if no valid moves are left
+movesLeft
+    ; clear TILE_SET_FLAGS
+    lda #0
+    sta memory.MEM_SET.valToSet
+    #load16BitImmediate TILE_SET_FLAGS, memory.MEM_SET.startAddress
+    #load16BitImmediate 256, memory.MEM_SET.length
+    jsr memory.memSet
+    ldy #0
+_loop
+    cpy FREE_LIST.len
+    beq _done
+    lda FREE_LIST.values, y
+    tax
+    lda #1
+    ora TILE_SET_FLAGS, x
+    sta TILE_SET_FLAGS, x
+    iny
+    bra _loop
+_done
+    lda #0
+    ldy #0
+    clc
+_loop2
+    adc TILE_SET_FLAGS, y
+    iny
+    cpy #NO_TILE
+    bne _loop2
+    cmp FREE_LIST.len
+    beq _noMoves
+    sec
+    rts
+_noMoves
+    clc
+    rts
+
 
 CELL_ADDR  .word 0
 setTileCall
@@ -470,7 +613,31 @@ _finishRedraw
     jsr select.mouseNormal
     jsr unselectTile
     jsr printTilesLeft
-    rts    
+    jsr checkPossibleMove
+    rts
+
+TXT_FREE_TILES .text "Free tiles: "
+TXT_NO_MOVES_LEFT .text "No moves left"
+TXT_MOVES_LEFT    .text "             "
+
+checkPossibleMove
+    jsr getAllFreeTiles
+    #locate 60, 4
+    #printString TXT_FREE_TILES, len(TXT_FREE_TILES)
+    lda FREE_LIST.len
+    sta txtio.WORD_TEMP
+    stz txtio.WORD_TEMP + 1
+    jsr txtio.printWordDecimal
+    #locate 60, 5
+    jsr movesLeft
+    bcc _noMoves
+    printString TXT_MOVES_LEFT, len(TXT_MOVES_LEFT)
+    bra _end
+_noMoves
+    printString TXT_NO_MOVES_LEFT, len(TXT_NO_MOVES_LEFT)
+_end
+    rts
+
 
 
 drawAll
