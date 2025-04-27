@@ -14,6 +14,7 @@ jmp main
 .include "txtio.asm"
 .include "select.asm"
 .include "playfield.asm"
+.include "create_solvable.asm"
 .include "memory.asm"
 .include "sprite.asm"
 
@@ -27,11 +28,11 @@ main
     jsr clut.init
 
     jsr showTitleScreen
+    jsr random.init
 
 _restart
     jsr hires.init
     jsr sprite.init
-    jsr random.init
     jsr txtio.init
     jsr txtio.cursorOff
  
@@ -64,7 +65,7 @@ _reset
     rts
 
 
-PROG_NAME .text "F256 Mahjongg. Developed for the April 2025 game jam. Version 1.0."
+PROG_NAME .text "F256 Mahjongg. Developed for the April 2025 game jam. Version 1.1.0"
 SUBTITLE .text "A Shanghai clone for the F256 line of modern retro computers"
 GAME_JAM .text "Find the source code at https://github.com/rmsk2/f256_mahjong"
 PROGRAMMING .text "Programming by Martin Grap (@mgr42)"
@@ -107,7 +108,6 @@ showTitleScreen
 
     #locate 17, 50
     #printString MOUSE_TEXT, len(MOUSE_TEXT)
-
 
     jsr waitForKey
     cmp #CTRL_C

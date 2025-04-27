@@ -1,3 +1,9 @@
+getRandRange .macro upperBound
+    lda #\upperBound
+    jsr random.getRange
+.endmacro
+
+
 random .namespace
 
 RNG_LO = $D6A4
@@ -61,6 +67,18 @@ _wait
     beq _wait
     lda RNG_LO
     ldx RNG_HI
+    rts
+
+
+getRange
+    sta $DE04
+    stz $DE05
+    jsr get
+    lda RNG_LO
+    eor RNG_HI
+    sta $DE06
+    stz $DE07
+    lda $DE16
     rts
 
 .endnamespace

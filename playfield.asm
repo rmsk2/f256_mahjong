@@ -12,6 +12,7 @@ Y_OFFSET = 18
 NO_TILE = $FF
 GROUP_SEASONS = 100
 GROUP_FLOWERS = 101
+GROUP_GENERIC = 30
 
 PLAYFIELD_SIZE = NUM_TILES_X * NUM_TILES_Y * NUM_TILES_Z
 TILE_DATA = $10000
@@ -34,11 +35,19 @@ init
     lda #144
     sta TILES_LEFT
 
-    jsr fillPlayfield
+    ;#load16BitImmediate fillPlayfield, SHUFFLE_VEC
+    #load16BitImmediate solvablegen.generate, SHUFFLE_VEC
+
+    jsr createRandPlayfield
     jsr printTilesLeft
     jsr checkPossibleMove
 
     rts
+
+SHUFFLE_VEC .word 0
+
+createRandPlayfield
+    jmp (SHUFFLE_VEC)
 
 
 clearPlayfield
@@ -268,7 +277,6 @@ _draw
 PLAYFIELD_VEC .word PLAYFIELD_MAIN
 
 PLAYFIELD_MAIN .fill PLAYFIELD_SIZE
-PLAYFIELD_GEN  .fill PLAYFIELD_SIZE
 
 FreeList_t .struct
     data   .fill NUM_TILES_X * NUM_TILES_Y * 2
@@ -622,12 +630,12 @@ TXT_MOVES_LEFT    .text "             "
 
 checkPossibleMove
     jsr getAllFreeTiles
-    #locate 60, 4
-    #printString TXT_FREE_TILES, len(TXT_FREE_TILES)
-    lda FREE_LIST.len
-    sta txtio.WORD_TEMP
-    stz txtio.WORD_TEMP + 1
-    jsr txtio.printWordDecimal
+    ; #locate 60, 4
+    ; #printString TXT_FREE_TILES, len(TXT_FREE_TILES)
+    ; lda FREE_LIST.len
+    ; sta txtio.WORD_TEMP
+    ; stz txtio.WORD_TEMP + 1
+    ; jsr txtio.printWordDecimal
     #locate 60, 5
     jsr movesLeft
     bcc _noMoves

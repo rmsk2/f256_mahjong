@@ -37,7 +37,6 @@ UNSHUFFLED_TILES
 
 SHUFFLED_TILES .fill 144
 
-
 initialFill
     ldx #0
 _loop
@@ -53,21 +52,13 @@ RAND_SRC .byte 0
 RAND_TARGET .byte 0
 shuffle
     #load16BitImmediate 0, RAND_COUNT
-    #load16BitImmediate 144, $DE04
-    stz $DE07    
 _loop
-    jsr random.get
-    ; calculate rand value in x mod 144
-    stx $DE06
-    ldx $DE16
-    ; store as index in RAND_SRC
-    stx RAND_SRC
-    ; calculate rand value in a mod 144
-    sta $DE06
-    lda $DE16
-    ; store as index in RAND_TARGET
+    #getRandRange 144
     sta RAND_TARGET
-    ;
+
+    #getRandRange 144
+    sta RAND_SRC
+
     ; swap values at indices RAND_SOURCE and RAND_TARGET
     ;
     ; Load value at index RAND_SOURCE and store it in y-register
@@ -97,6 +88,7 @@ _loop
 fillPlayfield
     jsr initialFill
     jsr shuffle
+fillPlayfieldNoShuffle
     ; upper wall
     #setTile 0, 3, 2, 0
     #setTile 1, 4, 2, 0
