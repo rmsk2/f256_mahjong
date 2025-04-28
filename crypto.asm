@@ -508,18 +508,6 @@ _getKeyByte
     rts
 
 
-unsetProcCallback
-    #load16BitImmediate callBackDummy, PROC_CALLBACK
-    rts    
-
-
-procCallback
-    jmp (PROC_CALLBACK)
-
-
-callBackDummy
-    rts
-
 VEC_LEN .byte 0
 ; --------------------------------------------------
 ; This routine copies the contents of string to which TEMP_PTR points to the
@@ -541,19 +529,8 @@ _copyDone
 
 KEY_ADDR .word 0
 NONCE_ADDR .word 0
-BUFFER_ADDR .word 0
-NUM_BUFFER_BYTES .word 0
-BUFFER_COUNT .word 0
 
-PROC_CALLBACK
-    .word callBackDummy
-; --------------------------------------------------
-; processBufferCall encrypts/decrypts the buffer stored at BUFFER_ADDR using
-; the key (as string) stored at KEY_ADDR and the nonce stored (as string) 
-; at .NONCE_ADDR. In the buffer NUM_BUFFER_BYTES bytes are encrypted.
-; --------------------------------------------------
-processBufferCall
-    #load16BitImmediate 0, BUFFER_COUNT
+chaChaInitCall
     jsr chaChaClearKey
 
     #move16Bit KEY_ADDR, TEMP_PTR
@@ -567,35 +544,14 @@ processBufferCall
     jsr copyByteVectorCall
 
     jsr chaChaInit
-    #move16Bit BUFFER_ADDR, ZERO_PAGE_7    
-_nextByte
-    #cmp16Bit BUFFER_COUNT, NUM_BUFFER_BYTES
-    beq _processingDone
-    jsr procCallback
-    jsr chaChaGetNextByte
-    eor (ZERO_PAGE_7)
-    sta (ZERO_PAGE_7)
-    #inc16Bit ZERO_PAGE_7
-    #inc16Bit BUFFER_COUNT
-    bra _nextByte
-_processingDone
     rts
 
-processBufferImmediate .macro addrKey, addrNonce, bufferAddr, numBytes 
-    #load16BitImmediate \addrKey, KEY_ADDR
-    #load16BitImmediate \addrNonce, NONCE_ADDR
-    #load16BitImmediate \bufferAddr, BUFFER_ADDR
-    #load16BitImmediate \numBytes, NUM_BUFFER_BYTES
-    jsr processBufferCall
-.endmacro
 
 
-processBufferAddr .macro addrKey, addrNonce, bufferAddr, numBytes
+setKeyAndNonceImmediate .macro addrKey, addrNonce
     #load16BitImmediate \addrKey, KEY_ADDR
     #load16BitImmediate \addrNonce, NONCE_ADDR
-    #load16BitImmediate \bufferAddr, BUFFER_ADDR
-    #move16Bit \numBytes, NUM_BUFFER_BYTES
-    jsr processBufferCall
+    jsr chaChaInitCall
 .endmacro
 
 
@@ -606,25 +562,29 @@ IS_TEST = 0
 CHACHA_TEST_KEY
 .byte $00, $01, $02, $03, $04, $05, $06, $07, $08, $09, $0a, $0b, $0c, $0d, $0e, $0f, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1a, $1b, $1c, $1d, $1e, $1f
 CHACHA_TEST_NONCE
-.byte $00, $00 ,$00 ,$00 ,$00 ,$00 ,$00 ,$4a, $00, $00, $00, $00
+.byte $00, $00 ,$00 ,$00 ,$00 ,$00 ,$00, $4a, $00, $00, $00, $00
 
 
-VALIDATE_LEN = 64
+VALIDATE_LEN = 114
 TEST_BUFFER .fill VALIDATE_LEN
-BUFFER_LEN .word VALIDATE_LEN
 VAL_COUNT .byte 0
 
 chachaTest
-    ldy #0
-    lda #0
-_loop1
-    sta TEST_BUFFER, y
-    iny
-    cpy #VALIDATE_LEN
-    bne _loop1
+    #setKeyAndNonceImmediate CHACHA_TEST_KEY, CHACHA_TEST_NONCE
+    stz VAL_COUNT
+_loop2
+    lda VAL_COUNT
+    cmp #VALIDATE_LEN
+    beq _doPrint
+    jsr chaChaGetNextByte
+    ldx VAL_COUNT
+    sta TEST_BUFFER, x
+    inc VAL_COUNT
+    bra _loop2
 
-    #processBufferAddr CHACHA_TEST_KEY, CHACHA_TEST_NONCE, TEST_BUFFER, BUFFER_LEN
-    
+_doPrint
+    jsr txtio.newLine
+    jsr txtio.newLine
     ldy #0
 _loop
     lda TEST_BUFFER, y

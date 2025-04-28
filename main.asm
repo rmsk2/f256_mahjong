@@ -16,6 +16,7 @@ jmp main
 .include "playfield.asm"
 .include "create_solvable.asm"
 .include "memory.asm"
+.include "crypto.asm"
 .include "sprite.asm"
 
 CTRL_C = 3
@@ -65,14 +66,17 @@ _reset
     rts
 
 
-PROG_NAME .text "F256 Mahjongg. Developed for the April 2025 game jam. Version 1.1.0"
+PROG_NAME .text "F256 Mahjongg. Developed for the April 2025 game jam. Version 1.1.1"
 SUBTITLE .text "A Shanghai clone for the F256 line of modern retro computers"
 GAME_JAM .text "Find the source code at https://github.com/rmsk2/f256_mahjong"
 PROGRAMMING .text "Programming by Martin Grap (@mgr42)"
-GRPAHICS .text    "Tile set graphics by @econtrerasd"
+GRPAHICS .text    "Tile set graphics by Ernesto Contreras (@econtrerasd)"
 KEY_STOP .text "- Press RUN/STOP to end program"
 KEY_RESRTART .text "- Press any other key to (re)start program"
 MOUSE_TEXT .text "You will need a mouse to play this game"
+
+TILE_COUNT .byte 0
+WOSCHT .byte 0
 
 showTitleScreen
     jsr hires.init
@@ -80,38 +84,80 @@ showTitleScreen
     jsr random.init
     jsr txtio.init
     jsr txtio.cursorOff
+    jsr playfield.dataInit
  
+    lda #255-12
+    sta hires.BACKGROUND_COLOUR
+
+    lda #BITMAP_0_MEM/8192
+    sta memory.BLIT_PARMS.targetRAMblock
+    jsr hires.clearBitmap
+
     #setCol (TXT_BLACK << 4) | (TXT_GREEN)
     jsr txtio.clear
     jsr txtio.home
 
-    #locate 5, 2
+    jsr hires.checkVBlank
+    jsr hires.on
+
+    #locate 5, 12
     #printString PROG_NAME, len(PROG_NAME)
 
-    #locate 8, 8
+    #locate 8, 14
     #printString SUBTITLE, len(SUBTITLE)
 
-    #locate 8, 10
+    #locate 8, 16
     #printString GAME_JAM, len(GAME_JAM)
 
-    #locate 19, 16
+    #locate 19, 22
     #printString PROGRAMMING, len(PROGRAMMING)
 
-    #locate 20,18
+    #locate 10, 24
     #printString GRPAHICS, len(GRPAHICS)
 
-    #locate 14, 26
+    #locate 14, 32
     #printString KEY_STOP, len(KEY_STOP)
 
-    #locate 14, 28
+    #locate 14, 34
     #printString KEY_RESRTART, len(KEY_RESRTART)
 
-    #locate 17, 50
+    #locate 17, 48
     #printString MOUSE_TEXT, len(MOUSE_TEXT)
+
+
+    #load16BitImmediate 0, memory.X_POS
+    stz memory.Y_POS
+    stz TILE_COUNT
+_loopTop
+    lda TILE_COUNT
+    jsr playfield.blitTile2D
+    #add16BitImmediate TILE_X, memory.X_POS
+    inc TILE_COUNT
+    lda TILE_COUNT
+    cmp #16
+    bne _loopTop   
+
+    #load16BitImmediate 0, memory.X_POS
+    lda #216
+    sta memory.Y_POS
+    stz TILE_COUNT
+_loopBottom
+    clc
+    lda TILE_COUNT
+    adc #17
+    jsr playfield.blitTile2D
+    #add16BitImmediate TILE_X, memory.X_POS
+    inc TILE_COUNT
+    lda TILE_COUNT
+    cmp #16
+    bne _loopBottom
+
+    ;jsr chacha20.chachaTest
 
     jsr waitForKey
     cmp #CTRL_C
     bne _return
     jmp sys64738
 _return
+    jsr hires.off
     rts

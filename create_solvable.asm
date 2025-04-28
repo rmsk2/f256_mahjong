@@ -153,14 +153,15 @@ PAIR_VAL_2 .byte 0
 
 generate
     jsr initData
+    ; shuffle input pairs
+    jsr shuffle
+_tryAgain
     ; clear twin
     #load16BitImmediate PLAYFIELD_GEN, playfield.PLAYFIELD_VEC    
     jsr playfield.clearPlayfield
     ; clear real playing field
     #load16BitImmediate playfield.PLAYFIELD_MAIN, playfield.PLAYFIELD_VEC
     jsr playfield.clearPlayfield
-    ; shuffle input pairs
-    jsr shuffle
     ; initialize stuff
     stz CURRENT_PAIR
     stz FLOWER_PTR
@@ -189,7 +190,7 @@ _doRand
     lda playfield.FREE_LIST.len
     ; If we end up with two tiles on top of each other restart calculation
     cmp #1
-    beq generate
+    beq _tryAgain
     jsr random.getRange
     sta FIRST
     lda playfield.FREE_LIST.len

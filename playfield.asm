@@ -19,17 +19,30 @@ TILE_DATA = $10000
 
 playfield .namespace
 
-init
+dataInit
     #load24BitImmediate TILE_DATA, TILE_PARAM.tileBase
     #load16BitImmediate PLAYFIELD_MAIN, PLAYFIELD_VEC
-    jsr clearPlayfield
-
     #load16BitImmediate 320, memory.BLIT_PARMS.lineSize
     lda #TILE_X
     sta memory.BLIT_PARMS.objSize
     lda #TILE_Y
     sta memory.BLIT_PARMS.numLines
     #load16BitImmediate memory.overwriteWithTransparency, memory.BLIT_VECTOR
+    rts
+
+init
+    ; #load24BitImmediate TILE_DATA, TILE_PARAM.tileBase
+    ; #load16BitImmediate PLAYFIELD_MAIN, PLAYFIELD_VEC
+    ; jsr clearPlayfield
+
+    ; #load16BitImmediate 320, memory.BLIT_PARMS.lineSize
+    ; lda #TILE_X
+    ; sta memory.BLIT_PARMS.objSize
+    ; lda #TILE_Y
+    ; sta memory.BLIT_PARMS.numLines
+    ; #load16BitImmediate memory.overwriteWithTransparency, memory.BLIT_VECTOR
+    jsr dataInit
+    jsr clearPlayfield
     jsr unselectTile
     stz A_TILE_IS_SELECTED
     lda #144
@@ -228,6 +241,31 @@ selectTile
 unselectTile
     stz A_TILE_IS_SELECTED
     jsr sprite.frameOff
+    rts
+
+
+
+TILE_NUM .byte 0
+; tile number in TILE_NUM
+; plot pos in X_POS and Y_POS
+blitTile2D
+    sta TILE_NUM
+    stz memory.SRC_ADDRESS + 2
+    #mul8x16BitCoproc TILE_NUM, TILE_SIZE, memory.SRC_ADDRESS
+    clc
+    lda memory.SRC_ADDRESS
+    adc TILE_PARAM.tileBase
+    sta memory.SRC_ADDRESS
+    lda memory.SRC_ADDRESS + 1
+    adc TILE_PARAM.tileBase + 1
+    sta memory.SRC_ADDRESS + 1
+    lda memory.SRC_ADDRESS + 2
+    adc TILE_PARAM.tileBase + 2
+    sta memory.SRC_ADDRESS + 2
+    jsr memory.linearToSourceAddress
+
+    jsr memory.pixelPosToTargetAddress    
+    jsr memory.blit
     rts
 
 
