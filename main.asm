@@ -138,7 +138,7 @@ _loopTop
     bne _loopTop   
 
     #load16BitImmediate 0, memory.X_POS
-    lda #216
+    lda #240-TILE_Y
     sta memory.Y_POS
     stz TILE_COUNT
 _loopBottom
@@ -152,7 +152,47 @@ _loopBottom
     cmp #16
     bne _loopBottom
 
-    ;jsr chacha20.chachaTest
+    #load16BitImmediate 0, memory.X_POS
+    lda #3 * 24
+    sta memory.Y_POS
+    stz TILE_COUNT
+_loopLeft
+    lda TILE_COUNT
+    clc
+    adc #33
+    jsr playfield.blitTile2D
+    lda #TILE_Y
+    clc
+    adc memory.Y_POS
+    sta memory.Y_POS
+    inc TILE_COUNT
+    lda TILE_COUNT
+    cmp #4
+    bne _loopLeft
+
+    #load16BitImmediate 320-TILE_X, memory.X_POS
+    lda #3 * TILE_Y
+    sta memory.Y_POS
+    stz TILE_COUNT
+_loopRight
+    lda TILE_COUNT
+    clc
+    adc #39
+    jsr playfield.blitTile2D
+    lda #TILE_Y
+    clc
+    adc memory.Y_POS
+    sta memory.Y_POS
+    inc TILE_COUNT
+    lda TILE_COUNT
+    cmp #4
+    bne _loopRight
+
+    #load16BitImmediate 320-3*TILE_X, memory.X_POS
+    lda #240-TILE_Y
+    sta memory.Y_POS
+    lda #37
+    jsr playfield.blitTile2D
 
     jsr waitForKey
     cmp #CTRL_C

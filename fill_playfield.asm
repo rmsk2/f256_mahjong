@@ -47,6 +47,7 @@ DATA_ADDR .word SHUFFLED_TILES
 RAND_COUNT .word 0
 RAND_SRC .byte 0
 RAND_TARGET .byte 0
+
 shuffle
     #load16BitImmediate 0, RAND_COUNT
     #move16Bit DATA_ADDR, TEMP_PTR

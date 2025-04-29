@@ -662,18 +662,12 @@ _finishRedraw
     jsr checkPossibleMove
     rts
 
-TXT_FREE_TILES .text "Free tiles: "
+
 TXT_NO_MOVES_LEFT .text "No moves left"
 TXT_MOVES_LEFT    .text "             "
 
 checkPossibleMove
     jsr getAllFreeTiles
-    ; #locate 60, 4
-    ; #printString TXT_FREE_TILES, len(TXT_FREE_TILES)
-    ; lda FREE_LIST.len
-    ; sta txtio.WORD_TEMP
-    ; stz txtio.WORD_TEMP + 1
-    ; jsr txtio.printWordDecimal
     #locate 60, 5
     jsr movesLeft
     bcc _noMoves
