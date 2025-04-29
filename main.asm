@@ -16,7 +16,7 @@ jmp main
 .include "playfield.asm"
 .include "create_solvable.asm"
 .include "memory.asm"
-.include "crypto.asm"
+;.include "crypto.asm"
 .include "sprite.asm"
 
 CTRL_C = 3

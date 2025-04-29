@@ -17,56 +17,8 @@ UNSHUFFLED_DATA
 .byte 31, 32, 33, 34
 .byte 31, 32, 33, 34
 
-SHUFFLED_DATA .fill 72
-
-initData
-    ldx #0
-_loop
-    lda UNSHUFFLED_DATA, x
-    sta SHUFFLED_DATA, x
-    inx
-    cpx #72
-    bne _loop
-    rts
-
-
-RAND_COUNT .word 0
-RAND_SRC .byte 0
-RAND_TARGET .byte 0
-
-shuffle
-    #load16BitImmediate 0, RAND_COUNT
-_shuffle
-    #getRandRange 72
-    sta RAND_TARGET
-
-    #getRandRange 72
-    sta RAND_SRC
-
-    ; swap values at indices RAND_SOURCE and RAND_TARGET
-    ;
-    ; Load value at index RAND_SOURCE and store it in y-register
-    ldx RAND_SRC
-    lda SHUFFLED_DATA, x
-    ; move value to y
-    tay
-    
-    ; load value at index RAND_TARGET
-    ldx RAND_TARGET
-    lda SHUFFLED_DATA, x
-    ; store value from index RAND_TARGET at index RAND_SRC
-    ldx RAND_SRC
-    sta SHUFFLED_DATA, x
-
-    ; store value in y (read from RAND_SRC) ant RAND_TARGET
-    ldx RAND_TARGET
-    tya
-    sta SHUFFLED_DATA, x
-
-    #inc16Bit RAND_COUNT
-    #cmp16BitImmediate 4000, RAND_COUNT
-    bne _shuffle
-    rts
+LEN_TILE_DATA = 72
+SHUFFLED_DATA .fill LEN_TILE_DATA
 
 
 FREE_TILE_INDEX .byte 0
@@ -152,9 +104,14 @@ PAIR_VAL_1 .byte 0
 PAIR_VAL_2 .byte 0
 
 generate
-    jsr initData
+    ; initialize tiles to place on playfield
+    #initTileData UNSHUFFLED_DATA, SHUFFLED_DATA, LEN_TILE_DATA
     ; shuffle input pairs
-    jsr shuffle
+    #load16BitImmediate 4000, playfield.RAND_MAX
+    lda #LEN_TILE_DATA
+    sta playfield.RANGE_MAX
+    #load16BitImmediate SHUFFLED_DATA, playfield.DATA_ADDR
+    jsr playfield.shuffle
 _tryAgain
     ; clear twin
     #load16BitImmediate PLAYFIELD_GEN, playfield.PLAYFIELD_VEC    
@@ -171,7 +128,7 @@ _tryAgain
 _loop
     ; we have 144 / 2 pairs to distribute
     lda CURRENT_PAIR
-    cmp #72
+    cmp #LEN_TILE_DATA
     beq _done
     ; switch to twin
     #load16BitImmediate PLAYFIELD_GEN, playfield.PLAYFIELD_VEC

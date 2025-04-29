@@ -35,58 +35,61 @@ UNSHUFFLED_TILES
 .byte 31, 32, 33, 34
 .byte 31, 32, 33, 34
 
-SHUFFLED_TILES .fill 144
 
-initialFill
-    ldx #0
-_loop
-    lda UNSHUFFLED_TILES,x
-    sta SHUFFLED_TILES, x
-    inx
-    cpx #144
-    bne _loop
-    rts
+LEN_TILE_DATA = 144
+SHUFFLED_TILES .fill LEN_TILE_DATA
+
+
+RAND_MAX .word 8000
+RANGE_MAX .byte LEN_TILE_DATA
+DATA_ADDR .word SHUFFLED_TILES
 
 RAND_COUNT .word 0
 RAND_SRC .byte 0
 RAND_TARGET .byte 0
 shuffle
     #load16BitImmediate 0, RAND_COUNT
+    #move16Bit DATA_ADDR, TEMP_PTR
 _loop
-    #getRandRange 144
+    #getRandRange RANGE_MAX
     sta RAND_TARGET
 
-    #getRandRange 144
+    #getRandRange RANGE_MAX
     sta RAND_SRC
 
     ; swap values at indices RAND_SOURCE and RAND_TARGET
     ;
-    ; Load value at index RAND_SOURCE and store it in y-register
-    ldx RAND_SRC
-    lda SHUFFLED_TILES, x
-    ; move value to y
-    tay
+    ; Load value at index RAND_SOURCE and store it in x-register
+    ldy RAND_SRC
+    lda (TEMP_PTR), y
+    ; move value to x
+    tax
     
     ; load value at index RAND_TARGET
-    ldx RAND_TARGET
-    lda SHUFFLED_TILES, x
+    ldy RAND_TARGET
+    lda (TEMP_PTR), y
     ; store value from index RAND_TARGET at index RAND_SRC
-    ldx RAND_SRC
-    sta SHUFFLED_TILES, x
+    ldy RAND_SRC
+    sta (TEMP_PTR), y
 
     ; store value in y (read from RAND_SRC) ant RAND_TARGET
-    ldx RAND_TARGET
-    tya
-    sta SHUFFLED_TILES, x
+    ldy RAND_TARGET
+    txa
+    sta (TEMP_PTR), y
 
     #inc16Bit RAND_COUNT
-    #cmp16BitImmediate 8000, RAND_COUNT
+    #cmp16Bit RAND_MAX, RAND_COUNT
     bne _loop
     rts
 
 
 fillPlayfield
-    jsr initialFill
+    ; initialize tiles to place on playfield
+    #initTileData UNSHUFFLED_TILES, SHUFFLED_TILES, LEN_TILE_DATA
+    #load16BitImmediate 8000, RAND_MAX
+    lda #LEN_TILE_DATA
+    sta RANGE_MAX
+    #load16BitImmediate SHUFFLED_TILES, DATA_ADDR
     jsr shuffle
 fillPlayfieldNoShuffle
     ; upper wall

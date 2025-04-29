@@ -1,5 +1,5 @@
 getRandRange .macro upperBound
-    lda #\upperBound
+    lda \upperBound
     jsr random.getRange
 .endmacro
 

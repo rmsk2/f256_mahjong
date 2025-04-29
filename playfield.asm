@@ -17,6 +17,16 @@ GROUP_GENERIC = 30
 PLAYFIELD_SIZE = NUM_TILES_X * NUM_TILES_Y * NUM_TILES_Z
 TILE_DATA = $10000
 
+initTileData .macro memUnshuffled, memShuffled, numElements
+    ldx #0
+_loop
+    lda \memUnshuffled,x
+    sta \memShuffled, x
+    inx
+    cpx #\numElements
+    bne _loop
+.endmacro    
+
 playfield .namespace
 
 dataInit
@@ -31,16 +41,6 @@ dataInit
     rts
 
 init
-    ; #load24BitImmediate TILE_DATA, TILE_PARAM.tileBase
-    ; #load16BitImmediate PLAYFIELD_MAIN, PLAYFIELD_VEC
-    ; jsr clearPlayfield
-
-    ; #load16BitImmediate 320, memory.BLIT_PARMS.lineSize
-    ; lda #TILE_X
-    ; sta memory.BLIT_PARMS.objSize
-    ; lda #TILE_Y
-    ; sta memory.BLIT_PARMS.numLines
-    ; #load16BitImmediate memory.overwriteWithTransparency, memory.BLIT_VECTOR
     jsr dataInit
     jsr clearPlayfield
     jsr unselectTile
