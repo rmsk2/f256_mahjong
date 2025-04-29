@@ -4,7 +4,7 @@ SUDO=
 
 BINARY=mahjong
 FORCE=-f
-PYTHON=python
+PYTHON=python3
 CP=cp
 DIST=dist
 TILES=tiles.bin
