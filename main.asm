@@ -159,7 +159,7 @@ _loopBottom
 _loopLeft
     lda TILE_COUNT
     clc
-    adc #33
+    adc #35
     jsr playfield.blitTile2D
     lda #TILE_Y
     clc
@@ -191,7 +191,7 @@ _loopRight
     #load16BitImmediate 320-3*TILE_X, memory.X_POS
     lda #240-TILE_Y
     sta memory.Y_POS
-    lda #37
+    lda #33
     jsr playfield.blitTile2D
 
     jsr waitForKey
