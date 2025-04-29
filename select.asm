@@ -83,6 +83,14 @@ mouseOff
 
 
 procKeyPressed
+    lda myEvent.key.flags
+    and #myEvent.key.META
+    beq _realKey
+    lda myEvent.key.raw
+    jsr testForFKey
+    sta KEY_PRESSED
+    rts
+_realKey
     lda myEvent.key.ascii
     sta KEY_PRESSED
     sec

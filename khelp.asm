@@ -59,7 +59,7 @@ waitForKey
     beq _done
     bra waitForKey
 _done
-    lda myEvent.key.flags 
+    lda myEvent.key.flags
     and #myEvent.key.META
     beq _isAscii
     lda myEvent.key.raw                                      ; retrieve raw key code
