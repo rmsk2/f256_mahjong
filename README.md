@@ -6,16 +6,16 @@ In this game the user is presented with a stack of 144 tiles. A pair of equal or
 from the stack. The game is won, if all tiles have been removed from the playing field. 
 
 A pair of tiles can be removed by using a mouse to click on the first tile and then on the second tile. This is only 
-possible if both of tiles which have been selected are "free" in the sense that they have no neighbour to the left or 
-the right and no tile on top of them. Additionally the tiles have to either show the same icon or be both of a 
+possible if both of the tiles which have been selected are "free" in the sense that they have no neighbour to the left
+or the right and no tile on top of them. Additionally the tiles have to either show the same icon or be both of a 
 compatible type. There are two sets of compatible tiles
 
 1. The seasons, shown as two blossoms, a brown leaf and a snow flake
 2. The flowers, shown as four flowers with stems
 
-When a tile is selected its upper left corner is painted in pink. As only free tiles can be selected you use this
-feature to test whether a given tile is free or not. If you click again on a selected tile the pink mark is removed
-again. 
+When a tile is selected its upper left corner is painted in pink. As only free tiles can be selected you can use
+this feature to test whether a given tile is free or not. If you click again on a selected tile the pink mark is
+removed again. 
 
 ## Using the software
 
