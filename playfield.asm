@@ -40,6 +40,7 @@ dataInit
     #load16BitImmediate memory.overwriteWithTransparency, memory.BLIT_VECTOR
     rts
 
+
 init
     jsr dataInit
     jsr clearPlayfield
@@ -49,7 +50,7 @@ init
     sta TILES_LEFT
 
     ;#load16BitImmediate fillPlayfield, SHUFFLE_VEC
-    #load16BitImmediate solvablegen.generate, SHUFFLE_VEC
+    ;#load16BitImmediate solvablegen.generate, SHUFFLE_VEC
 
     jsr createRandPlayfield
     jsr printTilesLeft
@@ -57,6 +58,11 @@ init
     jsr printUndoMoves
 
     rts
+
+DIFFICULTY_SOLVEABLE .text "SOLVEABLE"
+DIFFICULTY_RANDOM    .text " RANDOM  "
+
+DIFFICULTY_VEC .word DIFFICULTY_SOLVEABLE
 
 SHUFFLE_VEC .word 0
 
@@ -599,6 +605,10 @@ printTilesLeft
     #locate 72, 3
     #move16Bit TILES_LEFT, txtio.WORD_TEMP
     jsr txtio.printWordDecimal
+    #locate 36, 0
+    #move16Bit DIFFICULTY_VEC, TXT_PTR3
+    lda #len(DIFFICULTY_SOLVEABLE)
+    jsr txtio.printStr
     lda TILES_LEFT
     bne _done
     #locate 20, 30

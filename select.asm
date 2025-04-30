@@ -98,6 +98,20 @@ _testF1
     clc
     bra _done
 _noUndo
+    cmp #$83
+    bne _noDifficult
+    #load16BitImmediate playfield.fillPlayfield, playfield.SHUFFLE_VEC
+    #load16BitImmediate playfield.DIFFICULTY_RANDOM, playfield.DIFFICULTY_VEC
+    sec
+    bra _done
+_noDifficult
+    cmp #$85
+    bne _notRecognized
+    #load16BitImmediate solvablegen.generate, playfield.SHUFFLE_VEC
+    #load16BitImmediate playfield.DIFFICULTY_SOLVEABLE, playfield.DIFFICULTY_VEC
+    sec
+    bra _done
+_notRecognized
     sec
 _done
     rts
