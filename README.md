@@ -21,9 +21,13 @@ removed again.
 
 When playing the game you can return to BASIC at any time by pressing the RUN/STOP key (on your F256 K's keyboard) or 
 alternatively `Ctrl+c` on any Foenix 8 bit machine. When you press any other key a new random start configuration
-is created. This start configuration is constructed in such a way that it is guaranteed to be solvable. This in 
-turn does not mean that the player will actually follow the exact steps to clear the playing field. I estimate
-that the probability for successfully clearing the playing field is between 10% and 20%.  
+is created. As a default this start configuration is constructed in such a way that it is guaranteed to be solvable. 
+This in  turn does not mean that the player will actually follow the exact steps to clear the playing field. I 
+estimate that the probability for successfully clearing the playing field is between 10% and 20%.
+
+Alternatively the start configuration can be chosen at random, which tends to make the game more difficult.
+The strategy used, i.e. `RANDOM` or `SOLVEABLE` is displayed in the first line of the screen. Pressing F3 changes the 
+strategy to `RANDOM` and F5 changes it back to `SOLVEABLE`. Additionally up to 14 moves can be undone by pressing F1.
 
 # Building the software
 
