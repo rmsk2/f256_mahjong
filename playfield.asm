@@ -607,11 +607,11 @@ _done
     rts
 
 
-TXT_UNDO_MOVES .text "Moves to undo: "
+TXT_UNDO_MOVES .text "Moves to undo:   "
 printUndoMoves
     #locate 60, 4
     #printString TXT_UNDO_MOVES, len(TXT_UNDO_MOVES)
-    #locate 74, 4
+    #locate 75, 4
     lda undo.UNDO_DATA.length
     sta txtio.WORD_TEMP
     stz txtio.WORD_TEMP + 1
