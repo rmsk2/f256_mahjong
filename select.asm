@@ -89,6 +89,17 @@ procKeyPressed
     lda myEvent.key.raw
     jsr testForFKey
     sta KEY_PRESSED
+    bcs _testF1
+    rts
+_testF1
+    cmp #$81
+    bne _noUndo
+    jsr playfield.performUndo
+    clc
+    bra _done
+_noUndo
+    sec
+_done
     rts
 _realKey
     lda myEvent.key.ascii
@@ -130,6 +141,7 @@ _checkSameValue
     jsr playfield.selectTile
     rts
 _eraseTiles
+    jsr undo.pushState
     jsr playfield.erasePair
     jsr playfield.startRedraw
 _done

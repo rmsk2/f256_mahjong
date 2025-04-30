@@ -206,6 +206,18 @@ mul8x8BitCoprocImm .macro oper1, oper2, oper3
     #move16Bit $DE10, \oper3
 .endmacro
 
+
+mod8x8BitCoprocImm .macro valAddr, modulusImmediate
+    lda \valAddr
+    sta $DE06
+    stz $DE07
+    lda #\modulusImmediate
+    sta $DE04
+    stz $DE05
+    lda $DE16
+.endmacro
+
+
 mul8x16BitCoproc .macro oper1, oper2, oper3
     lda \oper1
     sta $DE00

@@ -17,6 +17,7 @@ jmp main
 .include "create_solvable.asm"
 .include "memory.asm"
 ;.include "crypto.asm"
+.include "undo.asm"
 .include "sprite.asm"
 
 CTRL_C = 3
@@ -32,6 +33,7 @@ main
     jsr random.init
 
 _restart
+    jsr undo.init
     jsr hires.init
     jsr sprite.init
     jsr txtio.init

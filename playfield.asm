@@ -54,6 +54,7 @@ init
     jsr createRandPlayfield
     jsr printTilesLeft
     jsr checkPossibleMove
+    jsr printUndoMoves
 
     rts
 
@@ -606,6 +607,30 @@ _done
     rts
 
 
+TXT_UNDO_MOVES .text "Moves to undo: "
+printUndoMoves
+    #locate 60, 4
+    #printString TXT_UNDO_MOVES, len(TXT_UNDO_MOVES)
+    #locate 74, 4
+    lda undo.UNDO_DATA.length
+    sta txtio.WORD_TEMP
+    stz txtio.WORD_TEMP + 1
+    jsr txtio.printWordDecimal
+    rts
+
+
+performUndo
+    jsr undo.popState
+    bcs _doNothing
+    clc
+    lda #2
+    adc TILES_LEFT
+    sta TILES_LEFT
+    jsr playfield.startRedraw
+_doNothing
+    rts
+
+
 erasePair
     #move16Bit TILE_PARAM.tileMem, LAYER_ADDR
     #move16Bit SELECTED_TILE.tileMem, LAYER_ADDR_SELECTED
@@ -666,6 +691,7 @@ _finishRedraw
     jsr unselectTile
     jsr printTilesLeft
     jsr checkPossibleMove
+    jsr printUndoMoves
     rts
 
 
