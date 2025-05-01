@@ -39,3 +39,6 @@ execute `make` to create a `.pgz` executbable which can be transferred to your F
 you can call `make upload` to build the program and upload the resulting binary via `FoenixMgr`. Use `make cartridge` 
 to create a KUP which can be stored in and run from cartridge flash.
 
+A prebuilt executable (`shanghai.pgz`) and a prebuilt cartridge image (`shanghai.bin`) can be found in the
+[`Releases`](https://github.com/rmsk2/f256_mahjong/releases) section of this repo. Use [`fcart`](https://github.com/rmsk2/cartflash)
+to write the image to your flash cartridge.
