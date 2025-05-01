@@ -112,6 +112,38 @@ _doProc
     rts
 
 
+TimeStamp_t .struct h, m, s
+    seconds .byte \s
+    minutes .byte \m
+    hours   .byte \h
+.endstruct
+
+
+setTimerHelp .macro type, interval, cookieSrc
+    ; get current value of timer
+    lda #\type | kernel.args.timer.QUERY
+    sta kernel.args.timer.units
+    jsr kernel.Clock.SetTimer
+    ; carry should be clear here as previous jsr clears it, when no error occurred
+    ; make a timer which fires interval units from now
+    adc \interval
+    sta kernel.args.timer.absolute
+    lda #\type
+    sta kernel.args.timer.units
+    lda \cookieSrc
+    sta kernel.args.timer.cookie
+    ; Create timer
+    jsr kernel.Clock.SetTimer
+.endmacro
+
+
+CLOCK_TICK .byte 1
+TIMER_COOKIE_CLOCK .byte 29
+setTimerClockTick
+    #setTimerHelp kernel.args.timer.SECONDS, CLOCK_TICK, TIMER_COOKIE_CLOCK
+    rts
+
+
 ; See chapter 17 of the system manual. Section 'Software reset'
 sys64738
     lda #$DE

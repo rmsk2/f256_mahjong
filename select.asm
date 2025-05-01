@@ -24,12 +24,18 @@ _newEvent
     jsr kernel.NextEvent
     bcs eventLoop
     ; Handle the event
-    lda myEvent.type    
+    lda myEvent.type
+    cmp #kernel.event.timer.EXPIRED
+    beq _evalTimer    
     cmp #kernel.event.key.PRESSED
     bne _checkMouseEvent
     jsr procKeyPressed
     bcc eventLoop
     rts
+_evalTimer
+    lda myEvent.timer.cookie
+    jsr processTimerEvent
+    bra eventLoop
 _checkMouseEvent
     cmp #kernel.event.mouse.DELTA
     bne _nextEventCheck    
@@ -119,6 +125,18 @@ _realKey
     lda myEvent.key.ascii
     sta KEY_PRESSED
     sec
+    rts
+
+
+processTimerEvent
+    ; pha
+    ; jsr txtio.printByte
+    ; pla
+    cmp TIMER_COOKIE_CLOCK
+    bne _doNothing
+    jsr playfield.displayTime
+    jsr setTimerClockTick
+_doNothing
     rts
 
 

@@ -16,16 +16,15 @@ SEED_VAL_HI .byte 0
 
 RTC_BUFFER .dstruct kernel.time_t
 
-kGetTimeStamp
+kGetTimeStampShort
     #load16BitImmediate RTC_BUFFER, kernel.args.buf
     lda #size(kernel.time_t)
     sta kernel.args.buflen
     jsr kernel.Clock.GetTime
     rts
 
-
 init
-    jsr kGetTimeStamp
+    jsr kGetTimeStampShort
     lda RTC_BUFFER.centis
     sta SEED_VAL_LO
     lda RTC_BUFFER.seconds

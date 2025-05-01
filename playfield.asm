@@ -48,9 +48,9 @@ init
     stz A_TILE_IS_SELECTED
     lda #144
     sta TILES_LEFT
-
-    ;#load16BitImmediate fillPlayfield, SHUFFLE_VEC
-    ;#load16BitImmediate solvablegen.generate, SHUFFLE_VEC
+    #getTimestamp TIMER_STATE.tsStart
+    lda #1
+    sta TIMER_STATE.doDisplay
 
     jsr createRandPlayfield
     jsr printTilesLeft
@@ -58,6 +58,14 @@ init
     jsr printUndoMoves
 
     rts
+
+TimerState_t .struct
+    doDisplay .byte 0
+    tsStart   .dstruct TimeStamp_t, 0, 0, 0
+.endstruct
+
+TIMER_STATE .dstruct TimerState_t
+
 
 DIFFICULTY_SOLVEABLE .text "SOLVEABLE"
 DIFFICULTY_RANDOM    .text " RANDOM  "
@@ -597,15 +605,19 @@ _equal
     rts
 
 
-TILES_LEFT_TXT .text "Tiles left:    "
-TXT_YOU_WIN .text "All tiles have been removed. You win!"
+TILES_LEFT_TXT    .text "Tiles left:    "
+TXT_YOU_WIN       .text "All tiles have been removed. You win!"
+TXT_YOU_WIN_CLEAR .text "                                     "
+
 printTilesLeft
+    #locate 20, 30
+    #printString TXT_YOU_WIN_CLEAR, len(TXT_YOU_WIN_CLEAR)
     #locate 60, 3
     #printString TILES_LEFT_TXT, len(TILES_LEFT_TXT)
     #locate 72, 3
     #move16Bit TILES_LEFT, txtio.WORD_TEMP
     jsr txtio.printWordDecimal
-    #locate 36, 0
+    #locate 32, 0
     #move16Bit DIFFICULTY_VEC, TXT_PTR3
     lda #len(DIFFICULTY_SOLVEABLE)
     jsr txtio.printStr
@@ -613,6 +625,7 @@ printTilesLeft
     bne _done
     #locate 20, 30
     #printString TXT_YOU_WIN, len(TXT_YOU_WIN)
+    stz TIMER_STATE.doDisplay
 _done
     rts
 
@@ -629,6 +642,21 @@ printUndoMoves
     rts
 
 
+TIME_STR .fill 8
+CURRENT_TIME .dstruct TimeStamp_t
+displayTime
+    lda TIMER_STATE.doDisplay
+    beq _done
+    #getTimestamp CURRENT_TIME
+    #diffTime TIMER_STATE.tsStart, CURRENT_TIME
+    #getTimeStr TIME_STR, CURRENT_TIME
+    #locate 32, 59
+    #printString TIME_STR, 8
+_done
+    rts
+
+
+
 performUndo
     jsr undo.popState
     bcs _doNothing
@@ -637,6 +665,8 @@ performUndo
     adc TILES_LEFT
     sta TILES_LEFT
     jsr playfield.startRedraw
+    lda #1
+    sta TIMER_STATE.doDisplay
 _doNothing
     rts
 
@@ -717,6 +747,7 @@ checkPossibleMove
     bra _end
 _noMoves
     printString TXT_NO_MOVES_LEFT, len(TXT_NO_MOVES_LEFT)
+    stz TIMER_STATE.doDisplay
 _end
     rts
 

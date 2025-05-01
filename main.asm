@@ -16,7 +16,7 @@ jmp main
 .include "playfield.asm"
 .include "create_solvable.asm"
 .include "memory.asm"
-;.include "crypto.asm"
+.include "rtc.asm"
 .include "undo.asm"
 .include "sprite.asm"
 
@@ -33,6 +33,7 @@ main
     jsr random.init
     #load16BitImmediate solvablegen.generate, playfield.SHUFFLE_VEC
     #load16BitImmediate playfield.DIFFICULTY_SOLVEABLE, playfield.DIFFICULTY_VEC
+    jsr setTimerClockTick
 
 _restart
     jsr undo.init
