@@ -605,7 +605,7 @@ _equal
     rts
 
 
-TILES_LEFT_TXT    .text "Tiles left:    "
+TILES_LEFT_TXT    .text "Tiles left   :    "
 TXT_YOU_WIN       .text "All tiles have been removed. You win!"
 TXT_YOU_WIN_CLEAR .text "                                     "
 
@@ -614,7 +614,7 @@ printTilesLeft
     #printString TXT_YOU_WIN_CLEAR, len(TXT_YOU_WIN_CLEAR)
     #locate 60, 3
     #printString TILES_LEFT_TXT, len(TILES_LEFT_TXT)
-    #locate 72, 3
+    #locate 75, 3
     #move16Bit TILES_LEFT, txtio.WORD_TEMP
     jsr txtio.printWordDecimal
     #locate 32, 0
