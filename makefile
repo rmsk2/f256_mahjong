@@ -1,20 +1,21 @@
+TILES=tiles.bin
+SUDO=
+BINARY=shanghai
+DIST=dist
+
 RM=rm
 PORT=/dev/ttyUSB0
-SUDO=
-
-BINARY=mahjong
 FORCE=-f
 PYTHON=python3
 CP=cp
-DIST=dist
-TILES=tiles.bin
 
 
 ifdef WIN
 RM=del
 PORT=COM3
-SUDO=
 FORCE=
+PYTHON=python
+CP=copy
 endif
 
 
@@ -25,10 +26,10 @@ all: pgz
 pgz: $(BINARY).pgz
 
 .PHONY: dist
-dist: clean pgz
+dist: clean pgz cartridge
 	$(RM) $(FORCE) $(DIST)/*
 	$(CP) $(BINARY).pgz $(DIST)/
-
+	$(CP) $(BINARY).bin $(DIST)/
 
 $(BINARY): *.asm
 	64tass --nostart -o $(BINARY) main.asm -l dummy.txt
@@ -37,6 +38,7 @@ clean:
 	$(RM) $(FORCE) $(BINARY)
 	$(RM) $(FORCE) dummy.txt
 	$(RM) $(FORCE) $(BINARY).pgz
+	$(RM) $(FORCE) $(BINARY).bin
 	$(RM) $(FORCE) tests/bin/*.bin
 	$(RM) $(FORCE) *.inc
 	$(RM) $(FORCE) $(TILES)
@@ -52,5 +54,13 @@ $(BINARY).pgz: $(BINARY) $(TILES)
 $(TILES): tileset.asm
 	64tass --nostart -o $(TILES) tileset_real.asm
 
+.PHONY: test
 test:
 	6502profiler verifyall -c config.json -trapaddr 0x07FF
+
+.PHONY: cartridge
+cartridge: $(BINARY).bin
+
+$(BINARY).bin: $(BINARY).pgz
+	pgz2flash -desc "A Shanghai clone" -name shanghai -out $(BINARY).bin -pgz $(BINARY).pgz
+
