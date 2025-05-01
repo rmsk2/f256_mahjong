@@ -28,7 +28,7 @@ successfully clearing the playing field is about 20%.
 
 Alternatively the start configuration can be chosen at random, which tends to make the game (much) more difficult and offers
 no guarantee that the deck is solveable. The strategy used, i.e. `RANDOM` or `SOLVEABLE` is displayed in the first line of the screen. 
-Pressing F3 changes the  strategy to `RANDOM` and pressing F5 changes it back to `SOLVEABLE`. Additionally up to 14 moves can be undone by 
+Pressing F3 changes the  strategy to `RANDOM` and pressing F5 changes it back to `SOLVEABLE`. Additionally previous moves can be undone by 
 pressing F1. The time spent playing using the current deck is shown on the bottom of the screen.
 
 # Building the software
