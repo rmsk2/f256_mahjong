@@ -7,12 +7,21 @@ MMU_ADDR = (MMU_WINDOW / 8192) + 8
 UNDO_DATA_ADDR = $1E000
 UNDO_DATA_RAM_BLOCK = UNDO_DATA_ADDR / 8192
 
-NUM_UNDO_STATE_MAX = 14
-
+NUM_UNDO_STATE_MAX = 72
 
 UndoData_t .struct
     index  .byte 0
     length .byte 0
+.endstruct
+
+TileInfo_t .struct
+    addr .word 0
+    num  .byte 0
+.endstruct
+
+StateChange_t .struct
+    tile1 .dstruct TileInfo_t
+    tile2 .dstruct TileInfo_t
 .endstruct
 
 UNDO_DATA .dstruct UndoData_t
@@ -29,11 +38,36 @@ pushState
     lda #UNDO_DATA_RAM_BLOCK
     sta MMU_ADDR
 
-    jsr calcIndexAddr    
-    #load16BitImmediate playfield.PLAYFIELD_MAIN, memory.MEM_CPY.startAddress
-    #move16Bit INDEX_ADDR, memory.MEM_CPY.targetAddress
-    #load16BitImmediate PLAYFIELD_SIZE, memory.MEM_CPY.length
-    jsr memory.memCpy
+    jsr calcIndexAddr
+
+    #move16Bit playfield.TILE_PARAM.tileMem, UNDO_PTR2
+    #move16Bit playfield.SELECTED_TILE.tileMem, UNDO_PTR3
+
+    ; save value of tile1
+    lda (UNDO_PTR2)
+    ldy #TileInfo_t.num
+    sta (UNDO_PTR1), y
+
+    ; save value of tile2
+    lda (UNDO_PTR3)
+    ldy #TileInfo_t.num + size(TileInfo_t)
+    sta (UNDO_PTR1), y
+
+    ; save address of tile2
+    lda UNDO_PTR2
+    ldy #TileInfo_t.addr
+    sta (UNDO_PTR1), y
+    iny
+    lda UNDO_PTR2 + 1
+    sta (UNDO_PTR1), y
+
+    ; save address of tile2
+    lda UNDO_PTR3
+    ldy #TileInfo_t.addr + size(TileInfo_t)
+    sta (UNDO_PTR1), y
+    iny
+    lda UNDO_PTR3 + 1
+    sta (UNDO_PTR1), y
 
     pla
     sta MMU_ADDR
@@ -49,10 +83,9 @@ _done
     rts
 
 
-INDEX_ADDR .word 0
 calcIndexAddr
-    #mul8x16BitCoproc UNDO_DATA.index, PLAYFIELD_SIZE, INDEX_ADDR
-    #add16BitImmediate MMU_WINDOW, INDEX_ADDR
+    #mul8x16BitCoproc UNDO_DATA.index, size(StateChange_t), UNDO_PTR1
+    #add16BitImmediate MMU_WINDOW, UNDO_PTR1
     rts
 
 
@@ -77,10 +110,32 @@ _notEmpty
     sta MMU_ADDR
 
     jsr calcIndexAddr
-    #move16Bit INDEX_ADDR, memory.MEM_CPY.startAddress
-    #load16BitImmediate playfield.PLAYFIELD_MAIN, memory.MEM_CPY.targetAddress
-    #load16BitImmediate PLAYFIELD_SIZE, memory.MEM_CPY.length
-    jsr memory.memCpy
+
+    ; restore address of tile 1
+    ldy #TileInfo_t.addr
+    lda (UNDO_PTR1), y
+    sta UNDO_PTR2
+    iny
+    lda (UNDO_PTR1), y
+    sta UNDO_PTR2 + 1
+
+    ; restore address of tile 2
+    ldy #TileInfo_t.addr + size(TileInfo_t)
+    lda (UNDO_PTR1), y
+    sta UNDO_PTR3
+    iny
+    lda (UNDO_PTR1), y
+    sta UNDO_PTR3 + 1
+
+    ; restore value of tile1
+    ldy #TileInfo_t.num
+    lda (UNDO_PTR1), y
+    sta (UNDO_PTR2)
+
+    ; restore vaule of tile2
+    ldy #TileInfo_t.num + size(TileInfo_t)
+    lda (UNDO_PTR1), y
+    sta (UNDO_PTR3)
 
     pla
     sta MMU_ADDR
