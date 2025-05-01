@@ -53,13 +53,12 @@ _restart
     sta memory.BLIT_PARMS.targetRAMblock
     jsr hires.clearBitmap
 
-    jsr select.mouseInit
     jsr select.mouseOn
+    jsr select.mouseInit
     jsr hires.on
     jsr playfield.init
     jsr playfield.drawAll
     jsr select.doSelect
-    jsr select.mouseOff
 
     lda KEY_PRESSED
     cmp #CTRL_C
@@ -76,9 +75,14 @@ SUBTITLE .text "A Shanghai clone for the F256 line of modern retro computers"
 GAME_JAM .text "Find the source code at https://github.com/rmsk2/f256_mahjong"
 PROGRAMMING .text "Programming by Martin Grap (@mgr42)"
 GRPAHICS .text    "Tile set graphics by Ernesto Contreras (@econtrerasd)"
-KEY_STOP .text "- Press RUN/STOP or CTRL+c to end program"
-KEY_RESRTART .text "- Press any other key to (re)start program"
+KEY_STOP     .text "- Press RUN/STOP or CTRL+c to end program"
+KEY_UNDO     .text "- Press F1 to undo last move"
+KEY_RANDOM   .text "- Press F5 to create random decks (difficult)"
+KEY_SOLVE    .text "- Press F3 to create solveable decks (less difficult)"
+KEY_RESRTART .text "- Press any other key to create a new deck"
+KEY_ANY  .text "Press any key (but RUN/STOP) to begin"
 MOUSE_TEXT .text "You will need a mouse to play this game"
+ENUM_POS = 13
 
 TILE_COUNT .byte 0
 WOSCHT .byte 0
@@ -120,15 +124,26 @@ showTitleScreen
     #locate 10, 24
     #printString GRPAHICS, len(GRPAHICS)
 
-    #locate 14, 32
+    #locate ENUM_POS, 32
     #printString KEY_STOP, len(KEY_STOP)
 
-    #locate 14, 34
+    #locate ENUM_POS, 34
+    #printString KEY_UNDO, len(KEY_UNDO)
+
+    #locate ENUM_POS, 36
+    #printString KEY_RANDOM, len(KEY_RANDOM)
+
+    #locate ENUM_POS, 38
+    #printString KEY_SOLVE, len(KEY_SOLVE)
+
+    #locate ENUM_POS, 40
     #printString KEY_RESRTART, len(KEY_RESRTART)
 
-    #locate 17, 48
+    #locate 17, 46
     #printString MOUSE_TEXT, len(MOUSE_TEXT)
 
+    #locate 18, 48
+    #printString KEY_ANY, len(KEY_ANY)
 
     #load16BitImmediate 0, memory.X_POS
     stz memory.Y_POS
