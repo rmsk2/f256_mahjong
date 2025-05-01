@@ -53,7 +53,7 @@ pushState
     ldy #TileInfo_t.num + size(TileInfo_t)
     sta (UNDO_PTR1), y
 
-    ; save address of tile2
+    ; save address of tile1
     lda UNDO_PTR2
     ldy #TileInfo_t.addr
     sta (UNDO_PTR1), y
