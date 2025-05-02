@@ -40,7 +40,8 @@ _checkMouseEvent
     cmp #kernel.event.mouse.DELTA
     bne _nextEventCheck    
     jsr procMouseEvent
-    bra eventLoop
+    bcc eventLoop
+    rts
 _nextEventCheck
     bra eventLoop
 
@@ -106,16 +107,20 @@ _testF1
 _noUndo
     cmp #$83
     bne _noDifficult
-    #load16BitImmediate playfield.fillPlayfield, playfield.SHUFFLE_VEC
-    #load16BitImmediate playfield.DIFFICULTY_RANDOM, playfield.DIFFICULTY_VEC
+    jsr playfield.toRandomConfig
     sec
     bra _done
 _noDifficult
     cmp #$85
-    bne _notRecognized
-    #load16BitImmediate solvablegen.generate, playfield.SHUFFLE_VEC
-    #load16BitImmediate playfield.DIFFICULTY_SOLVEABLE, playfield.DIFFICULTY_VEC
+    bne _noSolveable
+    jsr playfield.toSolveableConfig
     sec
+    bra _done
+_noSolveable
+    cmp #$87
+    bne _notRecognized
+    jsr playfield.performRestore
+    clc
     bra _done
 _notRecognized
     sec
@@ -129,9 +134,6 @@ _realKey
 
 
 processTimerEvent
-    ; pha
-    ; jsr txtio.printByte
-    ; pla
     cmp TIMER_COOKIE_CLOCK
     bne _doNothing
     jsr playfield.displayTime
@@ -161,22 +163,27 @@ processMouseState
     lda playfield.A_TILE_IS_SELECTED
     bne _checkEqual
     jsr playfield.selectTile
+    clc
     rts
 _checkEqual
     jsr playfield.selectedEqual
     bcc _checkSameValue
     jsr playfield.unselectTile
+    clc
     rts
 _checkSameValue
     jsr playfield.selectedMatch
     bcs _eraseTiles
     jsr playfield.selectTile
+    clc
     rts
 _eraseTiles
     jsr undo.pushState
     jsr playfield.erasePair
     jsr playfield.startRedraw
+    clc
 _done
+    clc
     rts
 
 

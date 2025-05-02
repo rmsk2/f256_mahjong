@@ -6,6 +6,7 @@ MMU_ADDR = (MMU_WINDOW / 8192) + 8
 ; use data at $1E000-$1FFFF
 UNDO_DATA_ADDR = $1E000
 UNDO_DATA_RAM_BLOCK = UNDO_DATA_ADDR / 8192
+UNDO_STATE_ADDR = MMU_WINDOW + $1000
 
 NUM_UNDO_STATE_MAX = 72
 
@@ -29,6 +30,40 @@ UNDO_DATA .dstruct UndoData_t
 init
     stz UNDO_DATA.index
     stz UNDO_DATA.length
+    rts
+
+
+saveState
+    lda MMU_ADDR
+    pha
+    lda #UNDO_DATA_RAM_BLOCK
+    sta MMU_ADDR
+
+    #load16BitImmediate playfield.PLAYFIELD_MAIN, memory.MEM_CPY.startAddress
+    #load16BitImmediate UNDO_STATE_ADDR, memory.MEM_CPY.targetAddress
+    #load16BitImmediate PLAYFIELD_SIZE, memory.MEM_CPY.length
+    jsr memory.memCpy
+
+    pla
+    sta MMU_ADDR
+
+    rts
+
+
+loadState
+    lda MMU_ADDR
+    pha
+    lda #UNDO_DATA_RAM_BLOCK
+    sta MMU_ADDR
+
+    #load16BitImmediate UNDO_STATE_ADDR, memory.MEM_CPY.startAddress
+    #load16BitImmediate playfield.PLAYFIELD_MAIN, memory.MEM_CPY.targetAddress
+    #load16BitImmediate PLAYFIELD_SIZE, memory.MEM_CPY.length
+    jsr memory.memCpy
+
+    pla
+    sta MMU_ADDR
+
     rts
 
 

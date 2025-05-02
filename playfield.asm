@@ -664,10 +664,34 @@ performUndo
     lda #2
     adc TILES_LEFT
     sta TILES_LEFT
-    jsr playfield.startRedraw
+    jsr startRedraw
     lda #1
     sta TIMER_STATE.doDisplay
 _doNothing
+    rts
+
+
+performRestore
+    jsr undo.loadState
+    lda #144
+    sta TILES_LEFT
+    lda #0
+    jsr undo.init
+    jsr startRedraw
+    lda #1
+    sta TIMER_STATE.doDisplay
+    rts
+
+
+toRandomConfig
+    #load16BitImmediate fillPlayfield, SHUFFLE_VEC
+    #load16BitImmediate DIFFICULTY_RANDOM, DIFFICULTY_VEC
+    rts
+
+
+toSolveableConfig
+    #load16BitImmediate solvablegen.generate, SHUFFLE_VEC
+    #load16BitImmediate DIFFICULTY_SOLVEABLE, DIFFICULTY_VEC
     rts
 
 

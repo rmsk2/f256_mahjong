@@ -57,6 +57,7 @@ _restart
     jsr select.mouseInit
     jsr hires.on
     jsr playfield.init
+    jsr undo.saveState
     jsr playfield.drawAll
     jsr select.doSelect
 
@@ -79,7 +80,8 @@ KEY_STOP     .text "- Press RUN/STOP or CTRL+c to end program"
 KEY_UNDO     .text "- Press F1 to undo last move"
 KEY_RANDOM   .text "- Press F5 to create random decks (difficult)"
 KEY_SOLVE    .text "- Press F3 to create solveable decks (less difficult)"
-KEY_RESRTART .text "- Press any other key to create a new deck"
+KEY_RESTORE  .text "- Press F7 to restart current deck"
+KEY_RESTART  .text "- Press any other key to create a new deck"
 KEY_ANY  .text "Press any key (but RUN/STOP) to begin"
 MOUSE_TEXT .text "You will need a mouse to play this game"
 ENUM_POS = 13
@@ -137,7 +139,10 @@ showTitleScreen
     #printString KEY_SOLVE, len(KEY_SOLVE)
 
     #locate ENUM_POS, 40
-    #printString KEY_RESRTART, len(KEY_RESRTART)
+    #printString KEY_RESTORE, len(KEY_RESTORE)
+
+    #locate ENUM_POS, 42
+    #printString KEY_RESTART, len(KEY_RESTART)
 
     #locate 17, 46
     #printString MOUSE_TEXT, len(MOUSE_TEXT)
