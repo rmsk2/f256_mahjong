@@ -40,9 +40,9 @@ clean:
 	$(RM) $(FORCE) $(BINARY).pgz
 	$(RM) $(FORCE) $(BINARY).bin
 	$(RM) $(FORCE) tests/bin/*.bin
-	$(RM) $(FORCE) *.inc
 	$(RM) $(FORCE) $(TILES)
-	$(RM) $(FORCE) $(DIST)/*
+	$(RM) $(FORCE) $(DIST)/*.bin
+	$(RM) $(FORCE) $(DIST)/*.phz
 
 
 upload: $(BINARY).pgz
