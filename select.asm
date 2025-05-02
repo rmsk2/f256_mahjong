@@ -156,6 +156,12 @@ procMouseEvent
 processMouseState
     lda MOUSE_DOWN
     beq _done
+    jsr txtui.checkForButton
+    cmp #txtui.NO_BUTTON
+    beq _checkTiles
+    jsr processButton
+    rts
+_checkTiles
     jsr playfield.checkForTile
     bcc _done
     jsr playfield.isTileFree
@@ -182,6 +188,49 @@ _eraseTiles
     jsr playfield.erasePair
     jsr playfield.startRedraw
     clc
+_done
+    clc
+    rts
+
+
+processButton
+    cmp #txtui.BUTTON_0
+    bne _checkb1
+    jsr playfield.performUndo
+    clc
+    rts
+_checkb1
+    cmp #txtui.BUTTON_1
+    bne _checkb2
+    jsr playfield.performRestore
+    clc
+    rts
+_checkb2
+    cmp #txtui.BUTTON_2
+    bne _checkb3
+    jsr playfield.toSolveableConfig
+    sec
+    rts
+_checkb3
+    cmp #txtui.BUTTON_3
+    bne _checkb4
+    jsr playfield.toRandomConfig
+    sec
+    rts
+_checkb4
+    cmp #txtui.BUTTON_4
+    bne _checkb5
+    lda #$20
+    sta KEY_PRESSED
+    sec
+    rts
+_checkb5
+    cmp #txtui.BUTTON_5
+    bne _done
+    lda #CTRL_C
+    sta KEY_PRESSED
+    sec
+    rts
 _done
     clc
     rts

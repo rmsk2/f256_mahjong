@@ -19,6 +19,7 @@ jmp main
 .include "rtc.asm"
 .include "undo.asm"
 .include "sprite.asm"
+.include "txtui.asm"
 
 CTRL_C = 3
 KEY_PRESSED .byte 0
@@ -59,6 +60,7 @@ _restart
     jsr playfield.init
     jsr undo.saveState
     jsr playfield.drawAll
+    jsr txtui.drawButtons
     jsr select.doSelect
 
     lda KEY_PRESSED
