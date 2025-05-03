@@ -73,7 +73,7 @@ _reset
     rts
 
 
-PROG_NAME .text "F256 Mahjongg. Developed for the April 2025 game jam. Version 1.2.1"
+PROG_NAME .text "F256 Mahjongg. Developed for the April 2025 game jam. Version 1.3.0"
 SUBTITLE .text "A Shanghai clone for the F256 line of modern retro computers"
 GAME_JAM .text "Find the source code at https://github.com/rmsk2/f256_mahjong"
 PROGRAMMING .text "Programming by Martin Grap (@mgr42)"

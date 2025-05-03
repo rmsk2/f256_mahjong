@@ -686,12 +686,24 @@ performRestore
 toRandomConfig
     #load16BitImmediate fillPlayfield, SHUFFLE_VEC
     #load16BitImmediate DIFFICULTY_RANDOM, DIFFICULTY_VEC
-    rts
+    jmp reinit
 
 
 toSolveableConfig
     #load16BitImmediate solvablegen.generate, SHUFFLE_VEC
     #load16BitImmediate DIFFICULTY_SOLVEABLE, DIFFICULTY_VEC
+    jmp reinit
+
+
+reinit
+    jsr undo.init
+    jsr select.mouseWait
+
+    jsr init
+    jsr undo.saveState
+    jsr startRedraw
+    lda #1
+    sta TIMER_STATE.doDisplay
     rts
 
 

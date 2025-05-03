@@ -109,14 +109,18 @@ _loop
 
     lda COL_TEMP
     sta CURSOR_STATE.col
+    jsr sprite.buttonBackgroundOn
     rts
 
 
 NO_BUTTON = $FF
 
-X_MIN .word 286
-Y_UPPER .byte 81
-Y_LOWER .byte 177
+BG_X = 286
+BG_Y = 82
+
+X_MIN .word BG_X
+Y_UPPER .byte BG_Y
+Y_LOWER .byte BG_y+6*16
 
 BUTTON_0 = 0
 BUTTON_1 = 1

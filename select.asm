@@ -97,38 +97,41 @@ procKeyPressed
     jsr testForFKey
     sta KEY_PRESSED
     bcs _testF1
+    ; here carry is clear
     rts
 _testF1
     cmp #$81
     bne _noUndo
     jsr playfield.performUndo
     clc
-    bra _done
+    rts
 _noUndo
     cmp #$83
     bne _noDifficult
     jsr playfield.toRandomConfig
-    sec
-    bra _done
+    clc
+    rts
 _noDifficult
     cmp #$85
     bne _noSolveable
     jsr playfield.toSolveableConfig
-    sec
-    bra _done
+    clc
+    rts
 _noSolveable
     cmp #$87
-    bne _notRecognized
+    bne _realKey
     jsr playfield.performRestore
     clc
-    bra _done
-_notRecognized
-    sec
-_done
     rts
 _realKey
     lda myEvent.key.ascii
     sta KEY_PRESSED
+    cmp #CTRL_C
+    beq _endGame
+    jsr playfield.reinit
+    clc
+    rts 
+_endGame
     sec
     rts
 
@@ -209,20 +212,19 @@ _checkb2
     cmp #txtui.BUTTON_2
     bne _checkb3
     jsr playfield.toSolveableConfig
-    sec
+    clc
     rts
 _checkb3
     cmp #txtui.BUTTON_3
     bne _checkb4
     jsr playfield.toRandomConfig
-    sec
+    clc
     rts
 _checkb4
     cmp #txtui.BUTTON_4
     bne _checkb5
-    lda #$20
-    sta KEY_PRESSED
-    sec
+    jsr playfield.reinit
+    clc
     rts
 _checkb5
     cmp #txtui.BUTTON_5
@@ -284,6 +286,7 @@ ClickPos_t .struct
 BUTTON_STATE   .byte 0                                    ; state of the primary button
 MOUSE_DOWN     .byte 0
 REDRAW_IN_PROGRESS .byte 0
+CLICK_ALLOWED .byte 0
 CLICK_POS .dstruct ClickPos_t
 MOUSE_POS .dstruct ClickPos_t
 
@@ -467,7 +470,6 @@ _done
 
 
 OLD_STATE .byte 0
-TEMP_REDRAW .byte 0
 ; record mouse clicks made with the primary button. Return with carry
 ; set if mouse was buttton changes from not pressed to pressed (MOUSE_DOWN event).
 ; Else carry is clear.
@@ -484,12 +486,8 @@ mouseClick
 
     lda OLD_STATE
     eor #BUTTON_IS_PRESSED
-    tax
-    lda REDRAW_IN_PROGRESS
-    eor #1
-    sta TEMP_REDRAW
-    txa
-    and TEMP_REDRAW
+
+    and CLICK_ALLOWED
     beq _noMouseDown
 
     #move16Bit $D6E2, CLICK_POS.x
@@ -523,6 +521,7 @@ _loop
     bne _loop
     #setIo 0
     #restoreIo
+    stz CLICK_ALLOWED
     rts
 
 
@@ -536,6 +535,8 @@ _loop
     bne _loop
     #setIo 0
     #restoreIo
+    lda #1
+    sta CLICK_ALLOWED
     rts
 
 
