@@ -29,7 +29,10 @@ successfully clearing the playing field is about 20%.
 Alternatively the start configuration can be chosen at random, which tends to make the game (much) more difficult and offers
 no guarantee that the deck is solveable. The strategy used, i.e. `RANDOM` or `SOLVEABLE` is displayed in the first line of the screen. 
 Pressing F3 changes the  strategy to `RANDOM` and pressing F5 changes it back to `SOLVEABLE`. Additionally previous moves can be undone by 
-pressing F1. The time spent playing using the current deck is shown on the bottom of the screen.
+pressing F1. To restore the deck to its original state, i.e. to undo all previous moves in one go, press F7.
+
+The commands described above can also be executed by clicking on the corresponding entry in the menu which is displayed to
+the right of the tile deck. The time spent playing using the current deck is shown on the bottom of the screen.
 
 # Building the software
 
