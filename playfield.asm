@@ -543,28 +543,33 @@ _equal
     rts
 
 
-isSpecial .macro start, end
-    cmp #\start
-    bcc _done
-    cmp #\end+1
-    bcc _ok
+isSpecial .macro t1, t2, t3, t4
+    cmp #\t1
+    beq _tileIsSpecial
+    cmp #\t2
+    beq _tileIsSpecial
+    cmp #\t3
+    beq _tileIsSpecial
+    cmp #\t4
+    beq _tileIsSpecial
     clc
-    bra _done
-_ok
-    sec
-_done
     lda #0
-    rol
+    rts
+_tileIsSpecial
+    sec
+    lda #1
+    rts
 .endmacro
 
+
+; carry is set if value in a is a season tile
 isSeason
-    #isSpecial 39, 42
-    rts
+    #isSpecial 39, 40, 41, 42
 
 
+; carry is set if value in a is a flower tile
 isFlower
-    #isSpecial 35, 38
-    rts
+    #isSpecial 35, 36, 37, 38
 
 
 TYPE_TEMP .byte 0

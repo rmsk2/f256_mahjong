@@ -3,6 +3,8 @@
 
 jmp main
 
+DO_DUMMY = 0
+
 .include "setup.asm"
 .include "api.asm"
 .include "clut.asm"
@@ -20,6 +22,9 @@ jmp main
 .include "undo.asm"
 .include "sprite.asm"
 .include "txtui.asm"
+.if DO_DUMMY == 1
+.include "dummy.asm"
+.endif
 
 CTRL_C = 3
 KEY_PRESSED .byte 0
@@ -32,7 +37,11 @@ main
 
     jsr showTitleScreen
     jsr random.init
+.if DO_DUMMY == 1
+    #load16BitImmediate dummy.getDummy, playfield.SHUFFLE_VEC
+.else
     #load16BitImmediate solvablegen.generate, playfield.SHUFFLE_VEC
+.endif
     #load16BitImmediate playfield.DIFFICULTY_SOLVEABLE, playfield.DIFFICULTY_VEC
     jsr setTimerClockTick
 
@@ -78,6 +87,7 @@ SUBTITLE .text "A Shanghai clone for the F256 line of modern retro computers"
 GAME_JAM .text "Find the source code at https://github.com/rmsk2/f256_mahjong"
 PROGRAMMING .text "Programming by Martin Grap (@mgr42)"
 GRPAHICS .text    "Tile set graphics by Ernesto Contreras (@econtrerasd)"
+TXT_MOUSE .text "In the game use the mouse to click on the menu to the right or ..."
 KEY_STOP     .text "- Press RUN/STOP or CTRL+c to end program"
 KEY_UNDO     .text "- Press F1 to undo last move"
 KEY_RANDOM   .text "- Press F5 to create random decks (difficult)"
@@ -127,6 +137,9 @@ showTitleScreen
 
     #locate 10, 24
     #printString GRPAHICS, len(GRPAHICS)
+
+    #locate ENUM_POS - 6, 29
+    #printString TXT_MOUSE, len(TXT_MOUSE)
 
     #locate ENUM_POS, 32
     #printString KEY_STOP, len(KEY_STOP)
