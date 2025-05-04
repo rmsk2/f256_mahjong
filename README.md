@@ -20,7 +20,7 @@ removed again.
 ## Using the software
 
 When playing the game you can return to BASIC at any time by pressing the RUN/STOP key (on your F256 K's keyboard) or 
-alternatively `Ctrl+c` on any Foenix 8 bit machine. When you press any key but F1, F3 and F5 a new random start configuration
+alternatively `Ctrl+c` on any Foenix 8 bit machine. When you press any key but F1, F3, F5 and F7 a new random start configuration
 is created. As a default this start configuration is constructed in such a way that it is guaranteed to be solvable. 
 This in  turn does not mean that you are guaranteed to solve the deck because it is not only possible but in fact likely that
 you will not recreate the exact steps which were taken during construction of the deck. I estimate that the probability for 
